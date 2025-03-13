@@ -3,7 +3,12 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 from openai import OpenAI
 
+<<<<<<< HEAD
 # 🔒 Firestore 인증
+=======
+# 🔒 API 키 불러오기
+api_key = 
+>>>>>>> fbbc818 (Update main.py)
 
 if firebase_admin._apps:
     firebase_admin.delete_app(firebase_admin.get_app())
