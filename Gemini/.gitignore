@@ -1,3 +1,4 @@
 # 환경 변수 파일 무시
 .env
 venv/
+/DB/Test-2b839-firebase-adminsdk-fbsvc-a9a8ef493c.json
