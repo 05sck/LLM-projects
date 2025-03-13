@@ -4,7 +4,7 @@ from firebase_admin import credentials, firestore
 #DB json형태, number 유형 사용
 
 # Firebase 인증 설정
-cred = credentials.Certificate('C:/test/config/test-2b839-firebase-adminsdk-fbsvc-a9a8ef493c.json')
+cred = credentials.Certificate("C:/Users/hssj5/OneDrive/Desktop/seongjun/ml_bootcamp/LLM-projects/Gemini/DB/Test-2b839-firebase-adminsdk-fbsvc-a9a8ef493c.json.json")
 firebase_admin.initialize_app(cred) #firebase 앱 초기화
 
 
@@ -15,10 +15,14 @@ db = firestore.client()
 
 # 'users' 콜렉션의 내용을 모두 가져오는 코드
 collection_ref = db.collection("users")
+
+type(collection_ref)
+
 # 콜렉션 안의 모든 문서 내용을 가져오는 코드
 docs = collection_ref.stream()
 for doc in docs:
     print(f"{doc.id} => {doc.to_dict()}")
+
 
 '''
 #----------------- 데이터베이스 삽입 코드(프로토타입에서 불필요)---------------------#
