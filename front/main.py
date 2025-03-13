@@ -2,7 +2,7 @@ import streamlit as st
 from openai import OpenAI
 
 # 🔒 API 키 불러오기
-api_key = st.secrets["general"]["openai_api_key"]
+api_key = 
 
 # OpenAI 클라이언트 생성
 client = OpenAI(api_key=api_key)
