@@ -7,13 +7,13 @@ from openai import OpenAI
 
 if firebase_admin._apps:
     firebase_admin.delete_app(firebase_admin.get_app())
-    
+
 cred = credentials.Certificate(r"C:\Users\Hoon\nipa\firebase\config\test-2b839-firebase-adminsdk-fbsvc-a9a8ef493c.json.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 # 🔒 OpenAI API 키
-api_key = "sk-IWn5Q3VNPxc96nWRLjUC_bZrkLREbaPyYlUjcg8bNdT3BlbkFJ730aN105iwHWVMVDMA1f82EzJO-3viXnn1VZjNvy4A"
+api_key = 
 client = OpenAI(api_key=api_key)
 
 # 📢 Streamlit UI
