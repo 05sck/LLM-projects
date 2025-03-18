@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "balmy-flash-415002",
+  "private_key_id": "667db12f8bb379cd61610402d98212229b141fbb",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCw4Df+NFepL6PG\ncuZcrrA0szTAdflZTl2F5FmTippgKkiEr0SqXhgwpPVaxqPUqJyXLQMnuepdNDE0\ns9Tk4esGbH0HAAXMiNUC8ljTnpYwS0Ggqz3rIMnuRKbHWWjMh/ld+hk6NrAt08oY\nLEe/UZJn3SIiYI/ItrLsYzZAMTH/nHWrj5OtujcX3xTFtZarHhLoiJ6bc2D0Tfr6\nhM3dmxXR3Y2FK1jY11GR915m8fnrSFORT4/HPjuqRKfy4DrxiN28PBhGNnNTzQYa\n7UJH6ItmnlNjbNLLiCQKQA5nqugeYhvre8xfp26rZPUyPBzUNfrUatIIA/OJXu0H\nrt0zh+zpAgMBAAECggEAR3TmGhwyWAcHjrpHp6TpSfkmNCTVLkezD88Pg0RJFtWu\nQ3B9eKiX9DsIZnp+oIDX9lk4f5mj/bCCuox2U1uT9B3rKuNO9HFJQS4ARco5Wdxl\ncJAN7UprWgfBKyNLa+n5DAbonzSN243HBRoKiFffondbfXDuVcO9qDNyrN9TGDUE\n2A9z53c384Y75GP6OdcujQ9xXQXU03MktnxuC3dluhFPYJlzEE0rDWpwG7lVY7HM\nldpq9K1+uPrXOqa6V3nZP9KIHMHqTMjgAKB6o4RWQILrwbRAz4OftDYWET/BZ08a\nl+LckAwOwSoqUZCFgAsDyVe47UyuNIpi3e0OHzPTGwKBgQDec/TPEyhHlmAT82Tx\nRxiofmnv48vVkFYwHVQtEWA/6YTwg4tABXA6ICPcmHAw4RXBeydTO0V0PpteRbmO\nKAU9HQarxjxq/dgBw3nNAP2ZhZddB4l02ZWy9rR6Sb+kAGYfmgiCghigrNM9Zjpg\n0LNsjV8gcctmy5i+QkIb0X7nxwKBgQDLjLUyyr1V4Nvzn0nUDMxmH78P57tAU+TD\nKpG2uR6k1UsJ46h7s/FJVyeMomNbJGr8fK/MDC68zyKFGhFA4nBa40VDH6i+wMwd\nUQV2KCzxR+/gCDj9f+NMStvGZt96aFzXJ9hkdfapKckNtAx06FmJccXPCch9zPaT\nonomub9lzwKBgBmd6tQp1Zqg04GYpsguMsW8gQCSD/gQ/gveZMIn3RifEKMN0uxV\nc/4Nk3Okzk6irPmx7+5ixfXD++pYRyz6qNfHzuvbETwU7VoOo6ka8xlJzAt3gbnG\nELoiNNhcQ8hkD16WQ2KcDq/6Fv1cF17syay3fvviftTgnz9RrAE+F8ojAoGAPgI+\njRugNFJND1meRyAjAJV5QiIpND6aeS41t8GLaVGlC300LYMy5VHMtZYeyHw+r25Y\nq8OmVVSQwpWfXfHdooKL7hft8zaOt/ufu1Af6N0uYUSAABH+r5Y6f6WFPSgf6Fe2\nH1ykaQJWwnrwNIk4BZwIU7s6PcC7+VvM9JEvkpcCgYEAkP4FjgkbR/htro8xNN2G\nsIhFFiBfvSyniYVleWwOdK9X+B0fvYeXUo9P/WMGl9+AMOIod+N+rGvafgIK+4J7\nJCgQkIxN0Gh13XAHHnAgspVmYU00dvbzmUl1weELZL8PxtZ7y+MtlZNXiZSEzu3G\nkG/j8mYg4c0KYcp3ul90zZU=\n-----END PRIVATE KEY-----\n",
+  "client_email": "calendar-service-account@balmy-flash-415002.iam.gserviceaccount.com",
+  "client_id": "109058583560348262625",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/calendar-service-account%40balmy-flash-415002.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
