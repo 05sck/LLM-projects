@@ -7,12 +7,12 @@ from google.oauth2 import service_account
 from openai import OpenAI
 
 # 🔑 OpenAI API 설정
-api_key = "YOUR_OPENAI_API_KEY"
-client = OpenAI(api_key=api_key)
+#api_key = "YOUR_OPENAI_API_KEY"
+#client = OpenAI(api_key=api_key)
 
 # 🔑 Google Calendar API 인증
 calendar_cred = service_account.Credentials.from_service_account_file(
-    r"C:\Users\Hoon\nipa\firebase\config\balmy-flash-415002-667db12f8bb3.json",
+    r"",
     scopes=["https://www.googleapis.com/auth/calendar"]
 )
 calendar_service = build("calendar", "v3", credentials=calendar_cred)
