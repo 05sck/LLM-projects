@@ -2,6 +2,7 @@ from rag_process.gemini_rag import create_rag_chain
 
 def main():
     """RAG 실행"""
+
     # RAG 체인 생성
     rag_chain = create_rag_chain()  # 올바른 체인 객체 반환
 
