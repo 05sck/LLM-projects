@@ -1,18 +1,15 @@
 <template>
-  <div id="app">
-    <h1>유치원 알림 시스템</h1>
-    <router-view />
-  </div>
+  <DefaultLayout />
 </template>
 
 <script setup>
+import DefaultLayout from "@/layouts/DefaultLayout.vue";
 </script>
 
 <style>
-/* 전체 페이지 스타일 */
-#app {
+body {
   font-family: Arial, sans-serif;
-  text-align: center;
-  margin-top: 20px;
+  margin: 0;
+  padding: 0;
 }
 </style>
