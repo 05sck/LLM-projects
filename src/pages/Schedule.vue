@@ -1,7 +1,5 @@
 <template>
   <div class="schedule-page">
-    <h1>📅 일정 변경</h1>
-
     <div class="form-container">
       <label>일정명</label>
       <select v-model="eventName">

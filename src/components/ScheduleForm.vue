@@ -1,6 +1,5 @@
 <template>
     <div class="schedule-form">
-      <h2>✏️ 일정 변경</h2>
       <label>📌 일정명</label>
       <select v-model="selectedEvent">
         <option v-for="event in events" :key="event.id" :value="event.name">
