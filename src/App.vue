@@ -14,10 +14,10 @@ body {
 }
 #app {
   width: 100%;
-  min-height: 100vh; /* ✅ 화면 크기만큼 최소 높이 유지 */
+  min-height: 100vh; 
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start; /* ✅ 위에서부터 확장 */
+  justify-content: flex-start;
 }
 </style>

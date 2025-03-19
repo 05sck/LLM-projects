@@ -1,8 +1,8 @@
 <template>
   <div class="layout">
-    <Sidebar /> <!-- ✅ 왼쪽 네비게이션 추가 -->
+    <Sidebar /> 
     <div class="content">
-      <router-view />  <!-- ✅ 메인 컨텐츠 영역 -->
+      <router-view /> 
     </div>
   </div>
 </template>
@@ -17,7 +17,7 @@ import Sidebar from "@/components/Sidebar.vue";
 }
 
 .content {
-  margin-left: 220px; /* 네비게이션 바 크기만큼 여백 */
+  margin-left: 220px; 
   padding: 20px;
   flex-grow: 1;
 }

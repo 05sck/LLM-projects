@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Home from "../pages/Home.vue"; // ✅ 그대로 유지
-import SchedulePage from "../views/SchedulePage.vue"; // ✅ 변경된 파일 경로
-import Medication from "../pages/Medication.vue";
+import Home from "../pages/Home.vue"; // 
+import SchedulePage from "../pages/SchedulePage.vue"; 
+import Medication from "../pages/MedicationPage.vue";
 
 const routes = [
   { path: "/", component: Home },
-  { path: "/schedule", component: SchedulePage }, // ✅ 변경
-  { path: "/medication", component: Medication }
+  { path: "/schedule", component: SchedulePage }, 
+  { path: "/medication", component: MedicationPage }
 ];
 
 const router = createRouter({
