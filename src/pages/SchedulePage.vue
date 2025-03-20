@@ -19,10 +19,10 @@
   </template>
   
   <script setup>
-  import { ref } from "vue";
-  import Calendar from "@/components/Calendar.vue";
-  import ScheduleForm from "@/components/ScheduleForm.vue";
-  import NotificationPreview from "@/components/NotificationPreview.vue";
+  import Calendar from "@/components/Schedule/Calendar.vue";
+import ScheduleForm from "@/components/Schedule/ScheduleForm.vue";
+import NotificationPreview from "@/components/notification/NotificationPreview.vue";
+import { ref } from "vue";
   
   const notificationText = ref("");
   

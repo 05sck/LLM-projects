@@ -21,10 +21,10 @@
   </template>
   
   <script setup>
-  import { ref } from "vue";
-  import MedicationTable from "@/components/MedicationTable.vue";
-  import MedicationForm from "@/components/MedicationForm.vue";
-  import NotificationPreview from "@/components/NotificationPreview.vue";
+import MedicationForm from "@/components/medication/MedicationForm.vue";
+import MedicationTable from "@/components/medication/MedicationTable.vue";
+import NotificationPreview from "@/components/notification/NotificationPreview.vue";
+import { ref } from "vue";
   
   const notificationText = ref("");
   
