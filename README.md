@@ -32,3 +32,7 @@ LLM-projects/
   │       │       └── index.js            # 라우팅
   │       └── vite.config.js
 ```
+`npm install vite --save-dev`
+`npm install vue-router@4 (vue3는 @4와 연동)`
+`npm install cors`
+`npm install axios`
