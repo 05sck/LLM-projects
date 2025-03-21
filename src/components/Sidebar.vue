@@ -3,19 +3,19 @@
     <h2>✅ 유치원</h2>
     <nav>
       <ul>
-        <li>
-          <router-link to="/">🏠 홈</router-link>
-        </li>
-        <li>
-          <router-link to="/schedule">📅 일정</router-link>
-        </li>
-        <li>
-          <router-link to="/medication">💊 복약</router-link>
-        </li>
+        <li><router-link to="/" @click="logClick('Home')">🏠 홈</router-link></li>
+        <li><router-link to="/schedule" @click="logClick('Schedule')">📅 일정</router-link></li>
+        <li><router-link to="/medication" @click="logClick('Medication')">💊 복약</router-link></li>
       </ul>
     </nav>
   </div>
 </template>
+
+<script setup>
+const logClick = (page) => {
+  console.log(`Clicked: ${page}`)
+}
+</script>
 
 <style scoped>
 .sidebar {

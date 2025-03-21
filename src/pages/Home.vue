@@ -40,6 +40,7 @@
   </div>
 </template>
 
+
 <script setup>
 import api from '@/modules/axios.js';
 import { onMounted, ref } from "vue";
@@ -47,10 +48,11 @@ import { onMounted, ref } from "vue";
 // ✅ 1️⃣ ref 변수를 먼저 선언
 const totalStudents = ref(0);
 const serverMessage = ref("로딩 중..."); // FastAPI 응답 표시용
-const attendance = ref({ present: 0, late: 0, absent: 0 });
+const attendance = ref({ present: 4, late: 1, absent: 0 }); //Mock데이터
 const weather = ref({ temperature: 0, description: "불러오는 중..." });
 const weeklySchedule = ref([]);
 
+/*
 // ✅ 2️⃣ Mock 데이터 적용 (초기값 설정)
 function setMockData() {
   totalStudents.value = 30; // 학생 30명
@@ -109,9 +111,18 @@ async function fetchDashboardData() {
     console.error("일정 실패:", error);
   }
 }
-
+*/
 // ✅ 4️⃣ 컴포넌트가 마운트되면 데이터 로딩
-onMounted(fetchDashboardData);
+onMounted(async () => {
+  try {
+    const res = await api.get("http://127.0.0.1:8000/");
+    serverMessage.value = res.data.message;
+    totalStudents.value = res.data.total_students;
+  } catch (error) {
+    console.error("Root fetch failed:", error);
+    serverMessage.value = "서버 오류!";
+  }
+});
 </script>
 
 <style scoped>

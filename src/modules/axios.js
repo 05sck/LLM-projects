@@ -7,6 +7,12 @@ function get(url) {
   return axios.get(finalUrl);
 }
 
+function post(url, data) {
+  const finalUrl = url.startsWith('http') ? url : BASE_URL + url;
+  return axios.post(finalUrl, data);
+}
+
 export default {
   get,
+  post,  // post 메서드 추가
 };
