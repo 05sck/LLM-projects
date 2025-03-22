@@ -35,7 +35,7 @@ def load_prompt(file_path):
     return prompt
 
 # 1. System 프롬프트 (역할 정의)
-prompt_template = load_prompt("rag_process/system_prompt.txt")
+prompt_template = load_prompt("system_prompt.txt")
 
 
 system_prompt_template = prompt_template.format(
@@ -47,7 +47,7 @@ formatted_system_prompt = SystemMessage(content=system_prompt_template)
 
 
 # 2. User 프롬프트 (질문 & context)
-template = load_prompt("rag_process/prompt.txt")
+template = load_prompt("prompt.txt")
 
 prompt = ChatPromptTemplate.from_messages([formatted_system_prompt, template])
 
@@ -65,7 +65,7 @@ chain = (
     )
 
 medicine = input("약 이름을 입력하세요: ")          # 예: 이큐펜키즈아이시럽
-information = input("어떤 정보를 원하시나요? (예: 부작용, 복용법): ")  # 예: 부작용
+information = input("어떤 정보를 원하시나요? (예: 주의사항, 사용법, 효능): ")  # 예: 부작용
 
 question = f"{medicine}의 {information}을 알려줘."
 
