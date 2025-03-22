@@ -34,19 +34,19 @@ def load_prompt(file_path):
         prompt = file.read().strip()
     return prompt
 
-# 🟢 1. System 프롬프트 (역할 정의)
+# 1. System 프롬프트 (역할 정의)
 prompt_template = load_prompt("rag_process/system_prompt.txt")
 
 
 system_prompt_template = prompt_template.format(
-    name="홍성준", age="6세", gender="남자", weight="15kg", height="120cm",
-    status="어머님이 요청하신대로 등원 직후 부루펜 100mg 복용하려 하였으나 점심을 먹지 복용하지 못한 상황황"
+    name="홍성준",
+    status="오후 12시 발열 증상하여 이큐펜키즈아이시럽(이부프로펜) 5ml 복용하였다."
 )
 
 formatted_system_prompt = SystemMessage(content=system_prompt_template)
 
 
-# 🟢 2. User 프롬프트 (질문 & context)
+# 2. User 프롬프트 (질문 & context)
 template = load_prompt("rag_process/prompt.txt")
 
 prompt = ChatPromptTemplate.from_messages([formatted_system_prompt, template])
@@ -60,13 +60,17 @@ retriever = vectorstore.as_retriever(
 chain = (
         {"context": retriever, "query": RunnablePassthrough()}
         | prompt
-        | openai_model
+        | openai_model  
         | StrOutputParser()
     )
 
-question = input("질문을 입력하세요: ")
+medicine = input("약 이름을 입력하세요: ")          # 예: 이큐펜키즈아이시럽
+information = input("어떤 정보를 원하시나요? (예: 부작용, 복용법): ")  # 예: 부작용
+
+question = f"{medicine}의 {information}을 알려줘."
 
 retrieved_docs = retriever.invoke(question)  
+
 print("검색된 문서:")
 for i, doc in enumerate(retrieved_docs):
     print(f"\n🔹 문서 {i+1}:\n{doc.page_content}")
