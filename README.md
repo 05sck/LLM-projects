@@ -11,7 +11,7 @@ LLM-projects/
   │   │   ├── services/
   │   │   │   ├── db_service.py           # MySQL 서비스
   │   │   │   ├── line_send_message.py    # LINE 서비스
-  │   │   │   └── llm_service/            # LLM 서비스
+  │   │   │   └── LLM_projects/            # LLM 서비스
   |   |   |       └──
   │   │   ├── routes/
   │   │   │   ├── medication.py           # 약 API
