@@ -2,9 +2,9 @@ import axios from 'axios';
 
 const BASE_URL = 'http://127.0.0.1:8000';
 
-function get(url) {
+function get(url, config = {}) {
   const finalUrl = url.startsWith('http') ? url : BASE_URL + url;
-  return axios.get(finalUrl);
+  return axios.get(finalUrl, config); // config 전달
 }
 
 function post(url, data) {
