@@ -1,5 +1,7 @@
 from app.services import db_service, line_send_message
+from app.services.llm_service import llm_fuc
 from fastapi import APIRouter
+from pydantic import BaseModel
 
 router = APIRouter()
 
@@ -24,4 +26,18 @@ async def send_line(request: dict):
     if success:
         return {"message": "LINE 메시지 전송 성공", "status": 200}
     return {"message": "LINE 전송 실패", "status": 500}
+
+class MessageRequest(BaseModel):
+    event: str
+    date: str
+    reason: str
+
+@router.post("/api/send-message")
+async def send_message(request: MessageRequest):
+    print("엔드포인트 호출됨:", request.dict())  # 요청 수신 확인
+    result = llm_fuc(request.event, request.date, request.reason)
+    print("결과 반환:", result)  # 결과 확인
+    return {"status": "success", "message": result}
+
+
 

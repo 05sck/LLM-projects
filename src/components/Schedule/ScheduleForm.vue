@@ -1,11 +1,7 @@
 <template>
-    <div class="schedule-form">
-      <label>📌 일정명</label>
-      <select v-model="selectedEvent">
-        <option v-for="event in events" :key="event.id" :value="event.name">
-          {{ event.name }}
-        </option>
-      </select>
+  <div class="schedule-form">
+    <label>📌 일정명</label>
+    <input type="text" v-model="eventName" placeholder="일정명을 입력하세요" />
   
       <label>📆 변경 날짜</label>
       <input type="date" v-model="newDate" />
@@ -18,25 +14,37 @@
   </template>
   
   <script setup>
-  import { ref, defineEmits } from "vue";
+  import axios from '@/modules/axios.js'; // 객체로 가져옴
+import { defineEmits, ref } from "vue";
   
   const emit = defineEmits(["updateNotification"]);
   
-  const events = ref([
-    { id: 1, name: "소풍" },
-    { id: 2, name: "체육대회" },
-    { id: 3, name: "학부모 상담" }
-  ]);
-  
-  const selectedEvent = ref("");
+  const eventName = ref("");
   const newDate = ref("");
   const reason = ref("");
   
-  const generateNotification = () => {
-    const message = `📢 [유치원 일정 변경 안내]\n"${selectedEvent.value}" 일정이 ${newDate.value}로 변경되었습니다.\n사유: ${reason.value}`;
-    emit("updateNotification", message);
-  };
-  </script>
+  const generateNotification = async () => {
+  console.log("버튼 클릭됨");  // 버튼 동작 확인
+  try {
+    console.log("요청 시작:", {
+      event: eventName.value,
+      date: newDate.value,
+      reason: reason.value
+    });
+    const response = await axios.post('/api/send-message', {
+      event: eventName.value,
+      date: newDate.value,
+      reason: reason.value
+    });
+    console.log("응답 수신:", response.data);
+    const generatedMessage = response.data.message;
+    emit("updateNotification", generatedMessage);
+  } catch (error) {
+    console.error("요청 오류:", error.message);
+    emit("updateNotification", `오류 발생: ${error.message}`);
+  }
+};
+</script>
   
   <style scoped>
   .schedule-form {
