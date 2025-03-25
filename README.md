@@ -31,8 +31,10 @@ LLM-projects/
   │   │   ├── Schedule/
   │   │   │   ├── Calendar.vue       # 캘린더 컴포넌트
   │   │   │   └── ScheduleForm.vue   # 일정 입력 폼
-  │   │   └── notification/
-  │   │       └── NotificationPreview.vue  # 알림 미리보기
+  │   │   ├── notification/
+  │   │   |   └── NotificationPreview.vue  # 알림 미리보기
+  │   │   ├── AutoCompleteInput.vue
+  │   │   └── Sidebar.vue
   │   ├── layouts/
   │   │   └── DefaultLayout.vue
   │   ├── modules/
@@ -42,10 +44,11 @@ LLM-projects/
   │   │   ├── MedicationPage.vue  # 복약 페이지
   │   │   └── SchedulePage.vue    # 일정 페이지
   │   ├── router/
-  │   │   ├── index.js     # Vue Router 설정
+  │   │   └── index.js     # Vue Router 설정
   │   ├── store/
   │   │   └── medication.js
-  │   │   └── schedule.js 
+  │   │   └── schedule.js
+  │   ├── App.vue          
   │   ├── main.js          # Vue 앱 진입점
   │   └── vite.config.js   # Vite 설정 (포트 등)
   └── (기타 파일: package.json, README.md 등)
