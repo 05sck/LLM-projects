@@ -1,0 +1,104 @@
+datetime,minutes,program,isoutside,teacher
+2025-03-27 08:30:00,30,Play - Free Choice,False,Ms. Sophia
+2025-03-27 09:00:00,30,Morning Circle Time,False,Ms. Emma
+2025-03-27 09:30:00,30,Physical Development (Gym),True,Mr. Daniel
+2025-03-27 10:00:00,30,Morning Snack,False,Ms. Emily
+2025-03-27 10:30:00,30,Teacher Initiated Activity (English Language),False,Mr. Daniel
+2025-03-27 11:00:00,30,PE,True,Mr. James
+2025-03-27 11:30:00,30,Lunch Time,False,Ms. Emily
+2025-03-27 12:00:00,60,Brushing Teeth / Quiet Time / Nap Time,False,Ms. Sophia
+2025-03-27 13:00:00,30,Music,False,Ms. Olivia
+2025-03-27 13:30:00,30,Literacy,False,Mr. Daniel
+2025-03-27 14:00:00,15,Afternoon Snack,False,Ms. Emily
+2025-03-27 14:15:00,30,Understanding the World,False,Mr. James
+2025-03-27 14:45:00,30,Child-Initiated Play,False,Mr. James
+2025-03-27 15:15:00,15,End of Day Circle Time,False,Ms. Emma
+2025-03-27 15:30:00,60,After School Club,True,Ms. Olivia
+2025-03-28 08:30:00,30,Play - Free Choice,False,Ms. Sophia
+2025-03-28 09:00:00,30,Morning Circle Time,False,Ms. Emma
+2025-03-28 09:30:00,30,Expressive Art & Design,False,Ms. Olivia
+2025-03-28 10:00:00,30,Morning Snack,False,Ms. Emily
+2025-03-28 10:30:00,60,Park,True,Ms. Emma
+2025-03-28 11:30:00,30,Lunch Time,False,Ms. Emily
+2025-03-28 12:00:00,60,Brushing Teeth / Quiet Time / Nap Time,False,Ms. Sophia
+2025-03-28 13:00:00,30,Child-Initiated Play,False,Mr. James
+2025-03-28 13:30:00,30,Library,False,Ms. Sophia
+2025-03-28 14:00:00,15,Afternoon Snack,False,Ms. Emily
+2025-03-28 14:15:00,30,Show and Tell,False,Ms. Emma
+2025-03-28 14:45:00,30,Mandarin,False,Ms. Sophia
+2025-03-28 15:15:00,15,End of Day Circle Time,False,Ms. Emma
+2025-03-28 15:30:00,60,After School Club,True,Ms. Olivia
+2025-03-31 08:30:00,30,Play - Free Choice,False,Ms. Sophia
+2025-03-31 09:00:00,30,Morning Circle Time,False,Ms. Emma
+2025-03-31 09:30:00,30,Sing along/ Storytime,False,Ms. Olivia
+2025-03-31 10:00:00,30,Morning Snack,False,Ms. Emily
+2025-03-31 10:30:00,30,Teacher Initiated Activity (English Language),False,Mr. Daniel
+2025-03-31 11:00:00,30,PE,True,Mr. James
+2025-03-31 11:30:00,30,Lunch Time,False,Ms. Emily
+2025-03-31 12:00:00,60,Brushing Teeth / Quiet Time / Nap Time,False,Ms. Sophia
+2025-03-31 13:00:00,30,Child-Initiated Play,False,Mr. James
+2025-03-31 13:30:00,30,Literacy,False,Mr. Daniel
+2025-03-31 14:00:00,15,Afternoon Snack,False,Ms. Emily
+2025-03-31 14:15:00,30,Maths,False,Mr. James
+2025-03-31 14:45:00,30,Mandarin,False,Ms. Sophia
+2025-03-31 15:15:00,15,End of Day Circle Time,False,Ms. Emma
+2025-03-31 15:30:00,60,After School Club,True,Ms. Olivia
+2025-04-01 08:30:00,30,Play - Free Choice,False,Ms. Sophia
+2025-04-01 09:00:00,30,Morning Circle Time,False,Ms. Emma
+2025-04-01 09:30:00,30,Physical Development (Gym),True,Mr. Daniel
+2025-04-01 10:00:00,30,Morning Snack,False,Ms. Emily
+2025-04-01 10:30:00,30,Teacher Initiated Activity (English Language),False,Mr. Daniel
+2025-04-01 11:00:00,30,PE,True,Mr. James
+2025-04-01 11:30:00,30,Lunch Time,False,Ms. Emily
+2025-04-01 12:00:00,60,Brushing Teeth / Quiet Time / Nap Time,False,Ms. Sophia
+2025-04-01 13:00:00,30,Music,False,Ms. Olivia
+2025-04-01 13:30:00,30,Literacy,False,Mr. Daniel
+2025-04-01 14:00:00,15,Afternoon Snack,False,Ms. Emily
+2025-04-01 14:15:00,30,Understanding the World,False,Mr. James
+2025-04-01 14:45:00,30,Child-Initiated Play,False,Mr. James
+2025-04-01 15:15:00,15,End of Day Circle Time,False,Ms. Emma
+2025-04-01 15:30:00,60,After School Club,True,Ms. Olivia
+2025-04-02 08:30:00,30,Play - Free Choice,False,Ms. Sophia
+2025-04-02 09:00:00,30,Morning Circle Time,False,Ms. Emma
+2025-04-02 09:30:00,30,Expressive Art & Design,False,Ms. Olivia
+2025-04-02 10:00:00,30,Morning Snack,False,Ms. Emily
+2025-04-02 10:30:00,30,Teacher Initiated Activity (English Language),False,Mr. Daniel
+2025-04-02 11:00:00,30,PE,True,Mr. James
+2025-04-02 11:30:00,30,Lunch Time,False,Ms. Emily
+2025-04-02 12:00:00,60,Brushing Teeth / Quiet Time / Nap Time,False,Ms. Sophia
+2025-04-02 13:00:00,30,Child-Initiated Play,False,Mr. James
+2025-04-02 13:30:00,30,Literacy,False,Mr. Daniel
+2025-04-02 14:00:00,15,Afternoon Snack,False,Ms. Emily
+2025-04-02 14:15:00,30,Maths,False,Mr. James
+2025-04-02 14:45:00,30,Mandarin,False,Ms. Sophia
+2025-04-02 15:15:00,15,End of Day Circle Time,False,Ms. Emma
+2025-04-02 15:30:00,60,After School Club,True,Ms. Olivia
+2025-04-03 08:30:00,30,Play - Free Choice,False,Ms. Sophia
+2025-04-03 09:00:00,30,Morning Circle Time,False,Ms. Emma
+2025-04-03 09:30:00,30,Physical Development (Gym),True,Mr. Daniel
+2025-04-03 10:00:00,30,Morning Snack,False,Ms. Emily
+2025-04-03 10:30:00,30,Teacher Initiated Activity (English Language),False,Mr. Daniel
+2025-04-03 11:00:00,30,PE,True,Mr. James
+2025-04-03 11:30:00,30,Lunch Time,False,Ms. Emily
+2025-04-03 12:00:00,60,Brushing Teeth / Quiet Time / Nap Time,False,Ms. Sophia
+2025-04-03 13:00:00,30,Music,False,Ms. Olivia
+2025-04-03 13:30:00,30,Literacy,False,Mr. Daniel
+2025-04-03 14:00:00,15,Afternoon Snack,False,Ms. Emily
+2025-04-03 14:15:00,30,Understanding the World,False,Mr. James
+2025-04-03 14:45:00,30,Child-Initiated Play,False,Mr. James
+2025-04-03 15:15:00,15,End of Day Circle Time,False,Ms. Emma
+2025-04-03 15:30:00,60,After School Club,True,Ms. Olivia
+2025-04-04 08:30:00,30,Play - Free Choice,False,Ms. Sophia
+2025-04-04 09:00:00,30,Morning Circle Time,False,Ms. Emma
+2025-04-04 09:30:00,30,Expressive Art & Design,False,Ms. Olivia
+2025-04-04 10:00:00,30,Morning Snack,False,Ms. Emily
+2025-04-04 10:30:00,60,Park,True,Ms. Emma
+2025-04-04 11:30:00,30,Lunch Time,False,Ms. Emily
+2025-04-04 12:00:00,60,Brushing Teeth / Quiet Time / Nap Time,False,Ms. Sophia
+2025-04-04 13:00:00,30,Child-Initiated Play,False,Mr. James
+2025-04-04 13:30:00,30,Library,False,Ms. Sophia
+2025-04-04 14:00:00,15,Afternoon Snack,False,Ms. Emily
+2025-04-04 14:15:00,30,Show and Tell,False,Ms. Emma
+2025-04-04 14:45:00,30,Mandarin,False,Ms. Sophia
+2025-04-04 15:15:00,15,End of Day Circle Time,False,Ms. Emma
+2025-04-04 15:30:00,60,After School Club,True,Ms. Olivia
