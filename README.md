@@ -9,8 +9,13 @@ LLM-projects/
   │   │   ├── config/
   │   │   │   └── mysql_config.py         # MySQL 설정
   │   │   ├── services/
+  │   │   │   ├── __init__.py
+  │   │   │   ├── automation_api.py
+  │   │   │   ├── kindergarten_schedule.csv
+  │   │   │   ├── weather_data_refined.csv
   │   │   │   ├── db_service.py           # MySQL 서비스
   │   │   │   ├── line_send_message.py    # LINE 서비스
+  │   │   │   ├── llm_service.py    
   │   │   │   └── LLM_projects/            # LLM 서비스
   |   |   |       └──
   │   │   ├── routes/
