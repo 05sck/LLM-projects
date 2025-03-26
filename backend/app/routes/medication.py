@@ -11,6 +11,7 @@ router = APIRouter()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# 기존 라우트 유지
 @router.get("/api/medications")
 def get_medications():
     return {"medications": db_service.get_medications()}
@@ -37,28 +38,40 @@ def add_medication_log(child_id: int, med_id: int, dosage: str, given_by: str):
             return {"message": "투약 기록 추가 및 LINE 전송 완료" if success else "LINE 전송 실패"}
     return {"message": "투약 기록 추가 실패"}
 
-# LINE 채널 액세스 토큰 (line_send_message.py에서 가져옴)
+# LINE 채널 액세스 토큰
 CHANNEL_ACCESS_TOKEN = "U5mOtIoUbFJ5K9L1cZJ3bqiMEEbA/aRriHqEU4IEntdiu4D7Ncr+C5YwxWSzAYAnXVYTNCDSbaC+rQdrxO/Lsjv7/bXOaqyFBqxxRVJp2IDwFMd1VgIhFfU0UMXK2YlPBISylCrSCK5K+h1xDCXdKgdB04t89/1O/w1cDnyilFU="
 
-# 새로운 라우터 (단순화)
+# 새로운 라우터 (LINE 전송용)
 class MedicationRequest(BaseModel):
     child_name: str
     med_name: str
     condition: str
     med_info: list
-    line_id: str  # LINE ID를 직접 받음
+    line_id: str
 
 @router.post("/api/send_line")
 async def send_medication_line(request: MedicationRequest):
-    enhanced_message = process_medication_rag(
+    result = process_medication_rag(
         request.child_name,
         request.med_name,
         request.condition,
         request.med_info
     )
-    line_send_message.send_line_message(CHANNEL_ACCESS_TOKEN, request.line_id, enhanced_message)
-    return {"message": enhanced_message}
+    # LINE으로 message 전송
+    logger.info(f"LINE 전송 시도: line_id={request.line_id}, message={result['message']}")
+    success = line_send_message.send_line_message(CHANNEL_ACCESS_TOKEN, request.line_id, result["message"])
+    logger.info(f"LINE 전송 결과: success={success}")
+    if not success:
+        logger.error(f"LINE 전송 실패: {request.line_id}")
+    response = {
+        "process_log": result["process_log"],
+        "message": result["message"],
+        "line_status": "전송 완료" if success else "전송 실패"
+    }
+    logger.info(f"반환 응답: {response}")
+    return response
 
+# 정보 조회 라우터 (웹 표시용)
 @router.get("/medicine-info/")
 async def get_medicine_info(
     request: Request,
@@ -67,7 +80,6 @@ async def get_medicine_info(
     condition: str = "상황 없음",
     med_info: str = "기본 정보"
 ):
-    # 실제 요청 URL과 쿼리 파라미터 로그
     logger.info(f"요청 URL: {request.url}")
     query_params = dict(request.query_params)
     logger.info(f"수신된 쿼리 파라미터: {query_params}")
@@ -75,9 +87,12 @@ async def get_medicine_info(
     try:
         med_info_list = [info.strip() for info in med_info.split(",") if info.strip()] if med_info else []
         logger.info(f"파싱된 med_info_list: {med_info_list}")
-        enhanced_message = process_medication_rag(child_name, med_name, condition, med_info_list)
-        logger.info(f"RAG 결과: {enhanced_message}")
-        return {"response": enhanced_message}
+        result = process_medication_rag(child_name, med_name, condition, med_info_list)
+        logger.info(f"RAG 결과: process_log={result['process_log']}, message={result['message']}")
+        return {
+            "process_log": result["process_log"],
+            "message": result["message"]
+        }
     except Exception as e:
         logger.error(f"RAG 처리 실패: {str(e)}")
         raise HTTPException(status_code=500, detail=f"약 정보 조회 실패: {str(e)}")

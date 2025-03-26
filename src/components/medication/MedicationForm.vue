@@ -35,7 +35,7 @@ async function submitForm() {
     console.error("아이 이름, 약 이름, 상황 설명을 모두 입력해주세요");
     const infoText = medInfo.value.length > 0 ? `\n약 정보: ${medInfo.value.join(", ")}` : "";
     const fallbackMessage = `📢 [유치원 복약 안내] ${childName.value || "미입력"} - ${medName.value || "미입력"}\n상황: ${condition.value || "미입력"}${infoText}`;
-    emit("update-notification", fallbackMessage);
+    emit("update-notification", { message: fallbackMessage, process_log: [] });
     return;
   }
 
@@ -47,26 +47,24 @@ async function submitForm() {
       med_info: medInfo.value.join(",") || "기본 정보",
     };
     console.log("전송 파라미터:", params);
-    const url = new URL("http://127.0.0.1:8000/medicine-info/");
-    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
-    console.log("생성된 요청 URL:", url.toString());
     const res = await api.get("/medicine-info/", { params });
-    console.log("실제 요청 URL:", res.request.responseURL);
-    console.log("RAG 응답:", res.data.response);
-    const response = res.data.response;
-    emit("update-notification", response);
+    console.log("RAG 응답:", res.data);
+    emit("update-notification", {
+      message: res.data.message,
+      process_log: res.data.process_log
+    });
   } catch (error) {
     console.error("약 정보 조회 실패:", error.response ? error.response.data : error);
-    if (error.response) {
-      console.error("상세 오류:", error.response.data.detail);
-      console.error("실제 요청 URL (에러 시):", error.config.url + '?' + new URLSearchParams(error.config.params).toString());
-    }
     const infoText = medInfo.value.length > 0 ? `\n약 정보: ${medInfo.value.join(", ")}` : "";
     const fallbackMessage = `📢 [유치원 복약 안내] ${childName.value} - ${medName.value}\n상황: ${condition.value}${infoText}`;
-    emit("update-notification", fallbackMessage);
+    emit("update-notification", { message: fallbackMessage, process_log: [] });
   }
 }
 </script>
+
+<style scoped>
+/* 기존 스타일 유지 */
+</style>
 
 <style scoped>
 .medication-form {
