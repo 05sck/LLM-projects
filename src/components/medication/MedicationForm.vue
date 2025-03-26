@@ -47,7 +47,6 @@ async function submitForm() {
       med_info: medInfo.value.join(",") || "기본 정보",
     };
     console.log("전송 파라미터:", params);
-    // URL 수동 생성 및 로그 출력
     const url = new URL("http://127.0.0.1:8000/medicine-info/");
     Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
     console.log("생성된 요청 URL:", url.toString());
@@ -68,28 +67,91 @@ async function submitForm() {
   }
 }
 </script>
-  
-  <style scoped>
+
+<style scoped>
+.medication-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+h2 {
+  font-size: 1.5rem;
+  color: #4a4a4a;
+  margin-bottom: 10px;
+}
+
+label {
+  font-size: 1.1rem;
+  color: #4a4a4a;
+  font-weight: 500;
+}
+
+input[type="text"] {
+  padding: 10px;
+  font-size: 1rem;
+  border: 2px solid #ff6f61;
+  border-radius: 8px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+input[type="text"]:focus {
+  border-color: #e65a50;
+  box-shadow: 0 0 5px rgba(255, 111, 97, 0.5);
+}
+
+.med-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.med-info label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  color: #4a4a4a;
+}
+
+.med-info input[type="checkbox"] {
+  accent-color: #ff6f61; /* 체크박스 색상 */
+  width: 16px;
+  height: 16px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  background-color: #ff6f61;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background-color: #e65a50;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(255, 111, 97, 0.3);
+}
+
+@media (max-width: 768px) {
   .medication-form {
-    display: flex;
-    flex-direction: column;
     gap: 10px;
   }
-  
-  input, button {
-    padding: 8px;
-    font-size: 16px;
+
+  h2 {
+    font-size: 1.3rem;
   }
-  
+
+  input[type="text"],
   button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    cursor: pointer;
+    font-size: 0.9rem;
   }
-  
-  button:hover {
-    opacity: 0.8;
-  }
-  </style>
-  
+}
+</style>
