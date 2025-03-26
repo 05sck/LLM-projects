@@ -51,25 +51,14 @@ class MedicationRequest(BaseModel):
 
 @router.post("/api/send_line")
 async def send_medication_line(request: MedicationRequest):
-    result = process_medication_rag(
+    enhanced_message = process_medication_rag(
         request.child_name,
         request.med_name,
         request.condition,
         request.med_info
     )
-    # LINE으로 message 전송
-    logger.info(f"LINE 전송 시도: line_id={request.line_id}, message={result['message']}")
-    success = line_send_message.send_line_message(CHANNEL_ACCESS_TOKEN, request.line_id, result["message"])
-    logger.info(f"LINE 전송 결과: success={success}")
-    if not success:
-        logger.error(f"LINE 전송 실패: {request.line_id}")
-    response = {
-        "process_log": result["process_log"],
-        "message": result["message"],
-        "line_status": "전송 완료" if success else "전송 실패"
-    }
-    logger.info(f"반환 응답: {response}")
-    return response
+    line_send_message.send_line_message(CHANNEL_ACCESS_TOKEN, request.line_id, enhanced_message)
+    return {"message": enhanced_message}
 
 # 정보 조회 라우터 (웹 표시용)
 @router.get("/medicine-info/")

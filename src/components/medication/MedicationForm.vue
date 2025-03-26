@@ -63,10 +63,6 @@ async function submitForm() {
 </script>
 
 <style scoped>
-/* 기존 스타일 유지 */
-</style>
-
-<style scoped>
 .medication-form {
   display: flex;
   flex-direction: column;

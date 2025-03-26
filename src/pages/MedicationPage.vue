@@ -30,39 +30,37 @@ let latestFormData = null;  // MedicationForm 데이터를 저장
 // MedicationForm에서 받은 데이터로 미리보기 업데이트
 const updateNotificationText = (data) => {
   latestFormData = {
-    child_name: data.child_name,
-    med_name: data.med_name,
-    condition: data.condition,
-    med_info: data.med_info
-  };  // LINE 전송용 데이터 저장
+    child_name: data.child_name || "미입력",
+    med_name: data.med_name || "미입력",
+    condition: data.condition || "미입력",
+    med_info: data.med_info || []  // undefined 방지
+  };
   notificationText.value = data.message;
   processLog.value = data.process_log;
+  console.log("Updated latestFormData:", latestFormData);
 };
 
 // LINE으로 메시지 전송
 const sendNotification = async () => {
-  if (!notificationText.value || !latestFormData) {
+  if (!notificationText.value) {
     alert("⚠️ 알림 문자가 없습니다! 먼저 '알림 생성'을 눌러주세요.");
     return;
   }
   try {
+    console.log("Sending to /api/send_line:", notificationText.value);  // 디버깅
     const res = await api.post("/api/send_line", {
-      child_name: latestFormData.child_name,
-      med_name: latestFormData.med_name,
-      condition: latestFormData.condition,
-      med_info: latestFormData.med_info,
-      line_id: "Uaecc6981aace6cd3c6788ffb6019f1ff"  // 고정된 LINE ID
+      message: notificationText.value,
+      user_id: "Uaecc6981aace6cd3c6788ffb6019f1ff",  // 동일한 사용자 ID
     });
     console.log("Response:", res.data);
-    alert(`📩 ${res.data.line_status}`);
-    resetForm();  // 전송 후 초기화
+    alert(`📩 ${res.data.message}`);
+    notificationText.value = "";
   } catch (error) {
     console.error("Failed to send LINE message:", error.response ? error.response.data : error.message);
     alert("📩 LINE 전송 실패!");
   }
 };
-
-// 폼 초기화
+//폼 초기화 
 const resetForm = () => {
   notificationText.value = "";
   processLog.value = [];
