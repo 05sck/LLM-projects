@@ -37,7 +37,7 @@
 
       <!-- 전체 스케줄 섹션 (실외만 표시) -->
       <div class="all-schedules">
-        <h2>📅 실외 일정</h2>
+        <h2>📅 실외 일정 (최근 4일)</h2>
         <table>
           <thead>
             <tr>
@@ -109,12 +109,19 @@ const changedSchedules = ref([]);
 const allSchedules = ref([]);
 const isIntro = ref(true);
 
-// 실외 일정만 필터링
+// 오늘부터 4일간의 실외 일정 필터링
 const outdoorSchedules = computed(() => {
-  const filtered = allSchedules.value.filter(schedule => schedule.isoutside === 1);
-  console.log("전체 데이터:", allSchedules.value); // 디버깅용
-  console.log("필터링된 실외 일정:", filtered);   // 디버깅용
-  return filtered;
+  const today = new Date();
+  const fourDaysLater = new Date(today);
+  fourDaysLater.setDate(today.getDate() + 3); // 오늘 포함 4일
+
+  return allSchedules.value
+    .filter(schedule => schedule.isoutside === 1)
+    .filter(schedule => {
+      const scheduleDate = new Date(schedule.datetime);
+      return scheduleDate >= today && scheduleDate <= fourDaysLater;
+    })
+    .sort((a, b) => new Date(a.datetime) - new Date(b.datetime)); // 날짜순 정렬
 });
 
 onMounted(async () => {
