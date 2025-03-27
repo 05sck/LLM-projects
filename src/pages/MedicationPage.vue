@@ -42,16 +42,16 @@
                 식품의약품 안전처_의약품개요정보(e약은요)에서 {{ medName || "약 이름" }}, 
                 {{ medInfo.length ? medInfo.join(", ") : "기본 정보" }}을 찾고 있습니다.
               </span>
-              <div v-if="isLoading" class="loading">문서를 찾고 있습니다...</div>
+              <div v-if="isLoading" class="loading">문서 로딩 시작...</div>
               <div v-if="processLog.length" class="log-section">
                 <span>찾은 문서들입니다:</span>
                 <div class="log-container">
-                  <div v-for="(log, index) in processLog.slice(0, 2)" :key="index" class="log-item">
+                  <div v-for="(log, index) in processLog.slice(1, 3)" :key="index" class="log-item">
                     {{ log }}
                   </div>
                 </div>
               </div>
-              <span v-if="reportGenerated">복약 보고서를 생성합니다.</span>
+              <span v-if="reportGenerated">복약 보고서를 생성합니다</span>
               <p v-if="notificationText" class="report-text">{{ notificationText }}</p>
             </div>
             <button v-if="reportGenerated" class="send-btn" @click="sendNotification">
@@ -315,6 +315,12 @@ const resetForm = () => {
   font-size: 1.1rem;
   color: #333;
   white-space: pre-wrap;
+}
+.report-generation {
+  margin-top: 10px;
+  font-size: 1rem;
+  color: #ff6f61;
+  font-weight: 500;
 }
 
 .send-btn {

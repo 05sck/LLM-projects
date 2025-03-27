@@ -242,7 +242,7 @@ const formatDateSimple = (dateString) => {
   transition: opacity 0.5s ease;
   width: 100%;
   position: relative;
-  top: -94px; /* 전체 콘텐츠를 2.5cm(약 94px) 위로 이동 */
+  top: -250px; /* 전체 콘텐츠를 2.5cm(약 94px) 위로 이동 */
 }
 
 .content.fade-in {

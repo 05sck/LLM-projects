@@ -1,93 +1,126 @@
 <template>
   <div class="schedule-page">
-    <!-- 왼쪽: 일정 입력 및 스케줄 표 -->
-    <div class="left-section">
-      <h2>📅 일정 입력</h2>
-      <ScheduleForm @updateNotification="updateNotificationText" />
-      <div class="weather-debug">
-        <h3>🌤️ 디버깅용 날씨 입력 (1시간 단위 시뮬레이션)</h3>
-        <p>현재 시각: {{ currentTime }}</p>
-        <input v-model.number="debugTemp" type="number" placeholder="온도 (°C)" />
-        <input v-model.number="debugPrecip" type="number" step="0.1" placeholder="강수량 (mm)" />
-        <button @click="updateSchedulesBasedOnWeather(debugTemp, debugPrecip)">오후 5시 시뮬레이션</button>
-      </div>
-      <div class="all-schedules">
-        <h3>📅 최근 4일 일정 (실내/실외)</h3>
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>날짜</th>
-                <th>시간</th>
-                <th>프로그램</th>
-                <th>실외</th>
-                <th>교사</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-if="recentSchedules.length === 0">
-                <td colspan="5">최근 4일간 일정 없음</td>
-              </tr>
-              <tr v-else v-for="schedule in recentSchedules" :key="schedule.datetime">
-                <td>{{ formatDateSimple(schedule.datetime) }}</td>
-                <td>{{ schedule.minutes }}</td>
-                <td>{{ schedule.program }}</td>
-                <td>{{ schedule.isoutside ? '예' : '아니오' }}</td>
-                <td>{{ schedule.teacher }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+    <!-- 상단 로고 -->
+    <div class="header">
+      <h1 class="logo">🫘 Jellybean Letter</h1>
+      <hr class="divider" />
     </div>
 
-    <!-- 가운데: 수동 알림 미리보기 -->
-    <div class="middle-section">
-      <h2>📢 일정변경 메세지</h2>
-      <div class="preview-row">
-        <NotificationPreview :message="notificationText" title="📢 일정변경 메세지" />
-      </div>
-      <button class="action-button" @click="sendManualNotification">📩 수동 문자 보내기</button>
-    </div>
-
-    <!-- 오른쪽: 날씨 기반 알림 -->
-    <div class="right-section">
-      <h2>🌤️ 날씨 & 변경되는 일정</h2>
-      <div class="preview-row">
-        <NotificationPreview :message="weatherNotificationText" />
-      </div>
-      <div v-if="changedSchedules.length" class="report-section">
-        <h3>🔄 변경된 일정</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>날짜</th>
-              <th>시간</th>
-              <th>프로그램</th>
-              <th>원래</th>
-              <th>변경 후</th>
-              <th>사유</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="s in changedSchedules" :key="s.datefcst">
-              <td>{{ formatDateSimple(s.datefcst) }}</td>
-              <td>{{ s.minutes }}</td>
-              <td>{{ s.program }}</td>
-              <td>{{ s.originalIsOutside ? '실외' : '실내' }}</td>
-              <td>{{ s.isoutside ? '실외' : '실내' }}</td>
-              <td>{{ s.weather_reason }}</td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="change-notice">
-          <h3>📝 수업 일정 변경 안내</h3>
-          <p>{{ generateChangeNotice() }}</p>
+    <!-- 콘텐츠 영역 -->
+    <div class="content-container">
+      <!-- 왼쪽: 최근 4일 일정 -->
+      <div class="left-section">
+        <div class="section">
+          <h2>📅 최근 4일 일정 (실내/실외)</h2>
+          <div v-if="isLoading">로딩 중...</div>
+          <div v-else class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>날짜</th>
+                  <th>시간</th>
+                  <th>프로그램</th>
+                  <th>실외</th>
+                  <th>교사</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-if="recentSchedules.length === 0">
+                  <td colspan="5">최근 4일간 일정 없음</td>
+                </tr>
+                <tr v-else v-for="schedule in recentSchedules" :key="schedule.datetime">
+                  <td>{{ formatDateSimple(schedule.datetime) }}</td>
+                  <td>{{ schedule.minutes }}</td>
+                  <td>{{ schedule.program }}</td>
+                  <td>{{ schedule.isoutside ? '예' : '아니오' }}</td>
+                  <td>{{ schedule.teacher }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-      <!-- 수정: 변경된 일정이 없을 때 백엔드 메시지 표시 -->
-      <p v-else class="no-changes">{{ weatherNotificationText || '🔄 변경된 일정이 없습니다' }}</p>
-      <button class="action-button" @click="sendWeatherNotification">📩 날씨 문자 보내기</button>
+
+      <!-- 세로 구분선 -->
+      <div class="vertical-divider"></div>
+
+      <!-- 오른쪽: 탭 영역 -->
+      <div class="right-section">
+        <div class="tab-container">
+          <div class="tab-buttons">
+            <button
+              :class="{ active: activeTab === 'schedule' }"
+              @click="activeTab = 'schedule'"
+            >
+              일정 변경 안내문 생성기
+            </button>
+            <button
+              :class="{ active: activeTab === 'weather' }"
+              @click="activeTab = 'weather'"
+            >
+              날씨 기반 자동 안내문 생성기
+            </button>
+          </div>
+
+          <!-- 탭 1: 일정 변경 안내문 생성기 -->
+          <div v-if="activeTab === 'schedule'" class="tab-content">
+            <div class="section">
+              <h2>📅 일정 입력</h2>
+              <ScheduleForm @updateNotification="updateNotificationText" />
+            </div>
+            <div class="section">
+              <h2>📢 일정변경 메세지</h2>
+              <NotificationPreview :message="notificationText" />
+              <button class="action-button" @click="sendManualNotification">📩 수동 문자 보내기</button>
+            </div>
+          </div>
+
+          <!-- 탭 2: 날씨 기반 자동 안내문 생성기 -->
+          <div v-if="activeTab === 'weather'" class="tab-content">
+            <div class="section">
+              <h2>🌤️ 디버깅용 날씨 입력</h2>
+              <p>현재 시각: {{ currentTime }}</p>
+              <input v-model.number="debugTemp" type="number" placeholder="온도 (°C)" />
+              <input v-model.number="debugPrecip" type="number" step="0.1" placeholder="강수량 (mm)" />
+              <button @click="updateSchedulesBasedOnWeather(debugTemp, debugPrecip)">오후 5시 시뮬레이션</button>
+            </div>
+            <div class="section">
+              <h2>🌤️ 날씨 & 변경되는 일정</h2>
+              <NotificationPreview :message="weatherNotificationText" />
+              <div v-if="changedSchedules.length" class="report-section">
+                <h3>🔄 변경된 일정</h3>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>날짜</th>
+                      <th>시간</th>
+                      <th>프로그램</th>
+                      <th>원래</th>
+                      <th>변경 후</th>
+                      <th>사유</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="s in changedSchedules" :key="s.datefcst">
+                      <td>{{ formatDateSimple(s.datefcst) }}</td>
+                      <td>{{ s.minutes }}</td>
+                      <td>{{ s.program }}</td>
+                      <td>{{ s.originalIsOutside ? '실외' : '실내' }}</td>
+                      <td>{{ s.isoutside ? '실외' : '실내' }}</td>
+                      <td>{{ s.weather_reason }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="change-notice">
+                  <h3>📝 수업 일정 변경 안내</h3>
+                  <p>{{ generateChangeNotice() }}</p>
+                </div>
+              </div>
+              <button class="action-button" @click="sendWeatherNotification">📩 날씨 문자 보내기</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -98,6 +131,7 @@ import NotificationPreview from "@/components/notification/NotificationPreview.v
 import api from "@/modules/axios.js";
 import { computed, onMounted, ref } from "vue";
 
+const activeTab = ref("schedule");
 const notificationText = ref("");
 const weatherNotificationText = ref("");
 const changedSchedules = ref([]);
@@ -105,23 +139,36 @@ const allSchedules = ref([]);
 const debugTemp = ref(26);
 const debugPrecip = ref(0.2);
 const currentTime = ref("");
+const isLoading = ref(true); // 로딩 상태 추가
 
-onMounted(() => {
-  fetchAllSchedules();
+onMounted(async () => {
+  await fetchAllSchedules(); // 비동기 호출 대기
   updateCurrentTime();
   setInterval(updateCurrentTime, 60000);
+  isLoading.value = false; // 데이터 로드 후 로딩 해제
 });
 
 const recentSchedules = computed(() => {
+  if (!allSchedules.value.length) {
+    console.log("allSchedules가 비어있습니다.");
+    return [];
+  }
+
   const today = new Date();
   const fourDaysLater = new Date(today);
   fourDaysLater.setDate(today.getDate() + 3);
-  return allSchedules.value
+
+  const filteredSchedules = allSchedules.value
     .filter(schedule => {
       const scheduleDate = new Date(schedule.datetime);
-      return scheduleDate >= today && scheduleDate <= fourDaysLater;
+      const isWithinRange = scheduleDate >= today && scheduleDate <= fourDaysLater;
+      console.log(`일정 필터링: ${schedule.datetime}, 범위 내: ${isWithinRange}`);
+      return isWithinRange;
     })
     .sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
+
+  console.log("최근 4일 일정:", filteredSchedules);
+  return filteredSchedules;
 });
 
 const fetchAllSchedules = async () => {
@@ -156,7 +203,6 @@ const updateSchedulesBasedOnWeather = async (temperature, precipitation) => {
     });
     console.log("변경된 스케줄 응답:", response.data);
 
-    // 응답 데이터 확인 및 처리
     if (response.data && Array.isArray(response.data.items) && response.data.items.length > 0) {
       changedSchedules.value = response.data.items.map(s => ({
         datefcst: s.datefcst,
@@ -170,7 +216,6 @@ const updateSchedulesBasedOnWeather = async (temperature, precipitation) => {
       weatherNotificationText.value = response.data.message || "변경된 스케줄이 있습니다.";
     } else {
       changedSchedules.value = [];
-      // 백엔드에서 제공한 메시지를 weatherNotificationText에 설정
       weatherNotificationText.value = response.data.message || "안녕하세요, 학부모님!\n\n현재 날씨에 따라 변경된 스케줄이 없습니다. 아이들이 평소처럼 즐겁게 지낼 예정이에요.\n\n감사합니다!";
     }
 
@@ -252,68 +297,103 @@ const formatDateSimple = (dateString) => {
 
 <style scoped>
 .schedule-page {
-  display: flex;
   width: 95%;
   margin: 20px auto;
-  gap: 10px;
 }
 
-.left-section, .middle-section, .right-section {
-  flex: 1;
-  padding: 20px;
-  border-radius: 10px;
-  background: #f8f9fa;
+.header {
+  text-align: center;
+  margin-bottom: 20px;
 }
 
-.middle-section {
-  background: #ffffff;
+.logo {
+  font-family: 'Poppins', sans-serif;
+  font-size: 2.5rem; /* 원래 크기로 복구 */
+  font-weight: 700;
+  background: linear-gradient(45deg, #ff6f61, #ffb88c);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 2px 2px 5px rgba(255, 111, 97, 0.3);
+  margin: 0;
 }
 
-.right-section {
-  background: #f0f8ff;
+.divider {
+  border: 1px solid #ddd;
+  margin: 10px 0;
 }
 
-.weather-debug {
-  margin: 20px 0;
-}
-
-.weather-debug input {
-  padding: 8px;
-  margin-right: 10px;
-  border-radius: 5px;
-  width: 100px;
-}
-
-.weather-debug button {
-  padding: 8px 15px;
-  background-color: #ff6f61;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.preview-row {
+.content-container {
   display: flex;
-  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.left-section, .right-section {
+  flex: 1;
+  min-width: 0; /* flex 아이템 축소 가능 */
+}
+
+.vertical-divider {
+  width: 2px;
+  background-color: #ddd;
+  margin: 0 10px;
+}
+
+.tab-container {
   width: 100%;
 }
 
-.all-schedules {
-  margin-top: 20px;
+.tab-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
-.all-schedules h3 {
-  font-size: 1.4rem;
+.tab-buttons button {
+  padding: 10px 20px;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #e9ecef;
   color: #4a4a4a;
-  margin-bottom: 10px;
+  transition: background-color 0.3s;
 }
 
+.tab-buttons button.active {
+  background-color: #ff6f61;
+  color: white;
+}
+
+.tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 10px;
+}
+
+.section {
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.section h2 {
+  font-size: 1.5rem;
+  color: #4a4a4a;
+  margin-bottom: 15px;
+}
+/*
 .table-wrapper {
   max-height: 300px;
   overflow-y: auto;
 }
-
+*/
 table {
   width: 100%;
   border-collapse: collapse;
@@ -338,9 +418,24 @@ td {
   color: #4a4a4a;
 }
 
+.section input {
+  padding: 8px;
+  margin-right: 10px;
+  border-radius: 5px;
+  width: 100px;
+}
+
+.section button {
+  padding: 8px 15px;
+  background-color: #ff6f61;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
 .report-section {
   margin-top: 20px;
-  width: 100%;
 }
 
 .change-notice {
@@ -373,5 +468,20 @@ td {
   color: white;
   width: 100%;
   text-align: center;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .content-container {
+    flex-direction: column;
+  }
+
+  .vertical-divider {
+    display: none;
+  }
+
+  .logo {
+    font-size: 2rem;
+  }
 }
 </style>
