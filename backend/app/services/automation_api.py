@@ -120,12 +120,11 @@ class WeatherActivityAdvisor:
             for schedule in changed_schedules:
                 query = """
                 UPDATE schedule 
-                SET isOutside = %s, weather_reason = %s 
+                SET isOutside = %s
                 WHERE start = %s AND program = %s
                 """
                 values = (
                     schedule['isoutside'],
-                    schedule['weather_reason'],
                     schedule['datefcst'],
                     schedule['program']
                 )
@@ -133,7 +132,7 @@ class WeatherActivityAdvisor:
                 cursor.execute(query, values)
                 if cursor.rowcount > 0:
                     updated_count += cursor.rowcount
-                    print(f"DB 업데이트 성공: {schedule['datefcst']} - {schedule['program']} - isOutside: {schedule['isoutside']} - Reason: {schedule['weather_reason']}")
+                    print(f"DB 업데이트 성공: {schedule['datefcst']} - {schedule['program']} - isOutside: {schedule['isoutside']}")
                 else:
                     print(f"DB 업데이트 실패 (변경 없음): {schedule['datefcst']} - {schedule['program']}")
             conn.commit()
