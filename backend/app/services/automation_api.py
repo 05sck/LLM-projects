@@ -7,9 +7,11 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 
 import google.generativeai as genai  # Gemini 추가
+import mysql.connector
 import numpy as np
 import pandas as pd
 import requests
+from app.config.mysql_config import config as db_config
 from dotenv import load_dotenv
 
 # 환경 변수 로드
@@ -165,11 +167,24 @@ def get_changed_schedules(nx: int = 62, ny: int = 126):
     return {"changed_schedules": changed_schedules, "message": message}
 
 def get_kindergarten_schedule():
-    file_path = BASE_DIR / 'kindergarten_schedule.csv'
-    print(f"CSV 파일 경로: {file_path}")
-    if not file_path.exists():
-        print(f"파일이 존재하지 않습니다: {file_path}")
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        query = """
+            SELECT start AS datetime, 
+                   TIMESTAMPDIFF(MINUTE, start, end) AS minutes, 
+                   program, 
+                   isOutside AS isoutside, 
+                   teacher 
+            FROM schedule
+        """
+        cursor.execute(query)
+        schedules = cursor.fetchall()
+        print(f"MySQL 데이터 행 수: {len(schedules)}")
+        return schedules
+    except Exception as e:
+        print(f"MySQL 조회 오류: {str(e)}")
         return []
-    df_schedule = pd.read_csv(file_path)
-    print(f"CSV 데이터 행 수: {len(df_schedule)}")
-    return df_schedule.to_dict(orient='records')
+    finally:
+        cursor.close()
+        conn.close()
