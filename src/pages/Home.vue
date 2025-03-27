@@ -35,9 +35,9 @@
         </div>
       </div>
 
-      <!-- 전체 스케줄 섹션 -->
+      <!-- 전체 스케줄 섹션 (실외만 표시) -->
       <div class="all-schedules">
-        <h2>📅 전체 일정</h2>
+        <h2>📅 실외 일정</h2>
         <table>
           <thead>
             <tr>
@@ -49,7 +49,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="schedule in allSchedules" :key="schedule.datetime">
+            <tr v-for="schedule in outdoorSchedules" :key="schedule.datetime">
               <td>{{ formatDate(schedule.datetime) }}</td>
               <td>{{ schedule.minutes }}</td>
               <td>{{ schedule.program }}</td>
@@ -74,8 +74,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="schedule in changedSchedules" :key="schedule.datefcst">
-              <td>{{ formatDate(schedule.datefcst) }}</td>
+            <tr v-for="schedule in changedSchedules" :key="schedule.datetime">
+              <td>{{ formatDate(schedule.datetime) }}</td>
               <td>{{ schedule.minutes }}</td>
               <td>{{ schedule.program }}</td>
               <td>{{ schedule.isoutside ? '예' : '아니오' }}</td>
@@ -100,7 +100,7 @@
 
 <script setup>
 import api from '@/modules/axios.js';
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 const totalStudents = ref(0);
 const weather = ref({ temperature: 0, description: "불러오는 중..." });
@@ -108,6 +108,14 @@ const weeklySchedule = ref([]);
 const changedSchedules = ref([]);
 const allSchedules = ref([]);
 const isIntro = ref(true);
+
+// 실외 일정만 필터링
+const outdoorSchedules = computed(() => {
+  const filtered = allSchedules.value.filter(schedule => schedule.isoutside === 1);
+  console.log("전체 데이터:", allSchedules.value); // 디버깅용
+  console.log("필터링된 실외 일정:", filtered);   // 디버깅용
+  return filtered;
+});
 
 onMounted(async () => {
   try {
@@ -119,12 +127,12 @@ onMounted(async () => {
 
   // 전체 스케줄 가져오기
   try {
-      const response = await api.get("http://127.0.0.1:8000/schedule/api/schedules");
-      console.log("전체 스케줄 데이터:", response.data);
-      allSchedules.value = response.data; // CSV 데이터를 allSchedules에 저장
-    } catch (error) {
-      console.error("전체 스케줄 불러오기 실패:", error);
-    }
+    const response = await api.get("http://127.0.0.1:8000/schedule/api/schedules");
+    console.log("받은 데이터:", response.data); // 디버깅용
+    allSchedules.value = response.data;
+  } catch (error) {
+    console.error("전체 스케줄 불러오기 실패:", error);
+  }
 
   // 변경된 스케줄 가져오기
   try {
