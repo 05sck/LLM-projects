@@ -54,7 +54,7 @@ nav ul {
 
 nav ul li {
   margin-bottom: 20px;
-  position: relative; /* ::after를 위한 relative 설정 */
+  position: relative;
 }
 
 nav ul li a.menu-link {
@@ -122,24 +122,39 @@ nav ul li a.router-link-exact-active {
 }
 
 nav ul li a.router-link-exact-active .menu-circle {
+  transform: scale(1.1); /* 선택된 상태에서 원 크기 유지 */
   box-shadow: 0 3px 8px rgba(255, 111, 97, 0.15);
 }
 
-/* 선택된 상태에서 오른쪽으로 흰색 사각형 연결 효과 */
+nav ul li a.router-link-exact-active .jelly-emoji {
+  transform: rotate(0); /* 선택된 상태에서는 회전 제거 */
+}
+
+nav ul li a.router-link-exact-active .logo-emoji {
+  transform: scale(1.05); /* 로고는 약간 더 크게 */
+}
+
 nav ul li a.router-link-exact-active::after {
   content: '';
   position: absolute;
   top: 50%;
-  left: 30px; /* menu-circle의 중심에서 시작 (menu-circle width 40px / 2 + padding 조정) */
-  width: 100px; /* 초기 너비 0으로 설정 */
-  height: 40px; /* menu-circle과 동일한 높이 */
+  left: 30px;
+  width: 100px;
+  height: 40px;
   background-color: #ffffff;
-  border-radius: 0; /* 사각형 유지 */
+  border-radius: 0;
   transform: translateY(-50%);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0);
   animation: expandSquare 0.3s ease forwards;
   z-index: 0;
 }
 
-
+@keyframes expandSquare {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 100px;
+  }
+}
 </style>

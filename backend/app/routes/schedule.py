@@ -1,9 +1,12 @@
+# backend/app/routes/schedule.py
 from app.services import db_service, line_send_message
+from app.services.automation_api import (get_changed_schedules,  # 새로 추가
+                                         get_kindergarten_schedule)
 from app.services.llm_service import llm_fuc
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-router = APIRouter()
+router = APIRouter(prefix="/schedule", tags=["schedule"])  # prefix 추가로 URL 깔끔하게
 
 @router.get("/api/schedule")
 def get_schedule():
@@ -20,8 +23,7 @@ async def send_line(request: dict):
     if not message:
         return {"message": "메시지를 입력해주세요", "status": 400}
     
-    # line_send_message.py에서 하드코딩된 토큰 사용
-    from app.services.line_send_message import CHANNEL_ACCESS_TOKEN
+    from ..services.line_send_message import CHANNEL_ACCESS_TOKEN
     success = line_send_message.send_line_message(CHANNEL_ACCESS_TOKEN, user_id, message)
     if success:
         return {"message": "LINE 메시지 전송 성공", "status": 200}
@@ -34,10 +36,19 @@ class MessageRequest(BaseModel):
 
 @router.post("/api/send-message")
 async def send_message(request: MessageRequest):
-    print("엔드포인트 호출됨:", request.dict())  # 요청 수신 확인
+    print("엔드포인트 호출됨:", request.dict())
     result = llm_fuc(request.event, request.date, request.reason)
-    print("결과 반환:", result)  # 결과 확인
+    print("결과 반환:", result)
     return {"status": "success", "message": result}
 
+# 새로 추가된 엔드포인트
+@router.get("/api/changed-schedules")
+async def fetch_changed_schedules(nx: int = 62, ny: int = 126):
+    print("changed-schedules 엔드포인트 호출됨")  # 추가
+    print(f"엔드포인트 호출됨: nx={nx}, ny={ny}")  # 추가
+    changed_schedules = get_changed_schedules(nx=nx, ny=ny)
+    return {"changed_schedules": changed_schedules}
 
-
+@router.get("/api/schedules")
+async def read_schedules():
+    return get_kindergarten_schedule()

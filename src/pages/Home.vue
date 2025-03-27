@@ -7,17 +7,9 @@
         출결 관리와 일정 알림을 간편하게 처리해 드립니다.<br>
         학부모와의 소통을 더 쉽게 만들어 줍니다.
       </p>
-      <div class="button-container">
-        <router-link to="/schedule" @click="logClick('Schedule')" class="action-button primary">
-          📅 일정
-        </router-link>
-        <router-link to="/medication" @click="logClick('Medication')" class="action-button secondary">
-          💊 복약
-        </router-link>
-      </div>
     </div>
 
-    <div class="content">
+    <div v-if="!isIntro" class="content">
       <div class="horizontal-layout">
         <!-- 학생 수 -->
         <div class="card">
@@ -42,6 +34,66 @@
           </ul>
         </div>
       </div>
+
+      <!-- 전체 스케줄 섹션 -->
+      <div class="all-schedules">
+        <h2>📅 전체 일정</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>날짜</th>
+              <th>시간 (분)</th>
+              <th>프로그램</th>
+              <th>실외 여부</th>
+              <th>담당 교사</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="schedule in allSchedules" :key="schedule.datetime">
+              <td>{{ formatDate(schedule.datetime) }}</td>
+              <td>{{ schedule.minutes }}</td>
+              <td>{{ schedule.program }}</td>
+              <td>{{ schedule.isoutside ? '예' : '아니오' }}</td>
+              <td>{{ schedule.teacher }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 변경된 스케줄 섹션 -->
+      <div class="changed-schedules" v-if="changedSchedules.length">
+        <h2>🔄 변경된 야외 스케줄</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>날짜</th>
+              <th>시간 (분)</th>
+              <th>프로그램</th>
+              <th>야외 여부</th>
+              <th>담당 교사</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="schedule in changedSchedules" :key="schedule.datefcst">
+              <td>{{ formatDate(schedule.datefcst) }}</td>
+              <td>{{ schedule.minutes }}</td>
+              <td>{{ schedule.program }}</td>
+              <td>{{ schedule.isoutside ? '예' : '아니오' }}</td>
+              <td>{{ schedule.teacher }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p v-else class="no-changes">🔄 변경된 스케줄이 없습니다.</p>
+
+      <div class="button-container">
+        <router-link to="/schedule" @click="logClick('Schedule')" class="action-button primary">
+          📅 일정
+        </router-link>
+        <router-link to="/medication" @click="logClick('Medication')" class="action-button secondary">
+          💊 복약
+        </router-link>
+      </div>
     </div>
   </div>
 </template>
@@ -51,28 +103,70 @@ import api from '@/modules/axios.js';
 import { onMounted, ref } from "vue";
 
 const totalStudents = ref(0);
-const serverMessage = ref("로딩 중...");
 const weather = ref({ temperature: 0, description: "불러오는 중..." });
 const weeklySchedule = ref([]);
+const changedSchedules = ref([]);
+const allSchedules = ref([]);
+const isIntro = ref(true);
 
 onMounted(async () => {
   try {
     const res = await api.get("http://127.0.0.1:8000/");
-    serverMessage.value = res.data.message;
     totalStudents.value = res.data.total_students;
   } catch (error) {
     console.error("Root fetch failed:", error);
-    serverMessage.value = "서버 오류!";
   }
+
+  // 전체 스케줄 가져오기
+  try {
+      const response = await api.get("http://127.0.0.1:8000/schedule/api/schedules");
+      console.log("전체 스케줄 데이터:", response.data);
+      allSchedules.value = response.data; // CSV 데이터를 allSchedules에 저장
+    } catch (error) {
+      console.error("전체 스케줄 불러오기 실패:", error);
+    }
+
+  // 변경된 스케줄 가져오기
+  try {
+    const response = await api.get("http://127.0.0.1:8000/schedule/api/changed-schedules", {
+      params: { nx: 62, ny: 126 },
+    });
+    changedSchedules.value = response.data.changed_schedules;
+  } catch (error) {
+    console.error("변경된 스케줄 불러오기 실패:", error);
+  }
+
+  setTimeout(() => {
+    isIntro.value = false;
+  }, 3000);
 });
 
-// 버튼 클릭 로그 함수
 const logClick = (page) => {
   console.log(`${page} 버튼이 클릭되었습니다.`);
+};
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleString("ko-KR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 };
 </script>
 
 <style scoped>
+.dashboard {
+  padding: 25px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Noto Sans KR', sans-serif;
+  position: relative;
+  min-height: 100vh;
+}
+
 .dashboard {
   padding: 25px;
   max-width: 1200px;
@@ -247,6 +341,84 @@ ul {
   .horizontal-layout {
     flex-direction: column;
     gap: 15px;
+  }
+}
+
+.all-schedules {
+  margin-top: 30px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.all-schedules:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(255, 111, 97, 0.2);
+}
+
+.all-schedules h2 {
+  font-size: 1.5rem;
+  color: #4a4a4a;
+  margin-bottom: 15px;
+}
+
+.changed-schedules {
+  margin-top: 30px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.changed-schedules:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(255, 111, 97, 0.2);
+}
+
+.changed-schedules h2 {
+  font-size: 1.5rem;
+  color: #4a4a4a;
+  margin-bottom: 15px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2;
+  font-weight: 600;
+  color: #4a4a4a;
+}
+
+.no-changes {
+  margin-top: 20px;
+  font-size: 1.1rem;
+  color: #4a4a4a;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .all-schedules, .changed-schedules {
+    margin-top: 15px;
+  }
+
+  table {
+    font-size: 0.9rem;
+  }
+
+  th, td {
+    padding: 6px;
   }
 }
 </style>

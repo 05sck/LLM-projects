@@ -31,7 +31,7 @@ import { defineEmits, ref } from "vue";
       date: newDate.value,
       reason: reason.value
     });
-    const response = await axios.post('/api/send-message', {
+    const response = await axios.post('/schedule/api/send-message', {
       event: eventName.value,
       date: newDate.value,
       reason: reason.value
