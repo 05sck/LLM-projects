@@ -64,14 +64,23 @@
 
           <!-- 탭 1: 일정 변경 안내문 생성기 -->
           <div v-if="activeTab === 'schedule'" class="tab-content">
-            <div class="section">
-              <h2>📅 일정 입력</h2>
+            <div class="section schedule-input-section">
               <ScheduleForm @updateNotification="updateNotificationText" />
             </div>
             <div class="section">
               <h2>📢 일정변경 메세지</h2>
               <NotificationPreview :message="notificationText" />
-              <button class="action-button" @click="sendManualNotification">📩 수동 문자 보내기</button>
+              <label>
+                <input type="checkbox" v-model="keepNotificationText"> 전송 후 메시지 유지
+              </label>
+              <button
+                class="action-button"
+                type="button"
+                @click="sendManualNotification"
+                :disabled="isSending"
+              >
+                {{ isSending ? '전송 중...' : '📩 수동 문자 보내기' }}
+              </button>
             </div>
           </div>
 
@@ -82,7 +91,9 @@
               <p>현재 시각: {{ currentTime }}</p>
               <input v-model.number="debugTemp" type="number" placeholder="온도 (°C)" />
               <input v-model.number="debugPrecip" type="number" step="0.1" placeholder="강수량 (mm)" />
-              <button @click="updateSchedulesBasedOnWeather(debugTemp, debugPrecip)">오후 5시 시뮬레이션</button>
+              <button @click="updateSchedulesBasedOnWeather(debugTemp, debugPrecip)">
+                오후 5시 시뮬레이션
+              </button>
             </div>
             <div class="section">
               <h2>🌤️ 날씨 & 변경되는 일정</h2>
@@ -116,7 +127,9 @@
                   <p>{{ generateChangeNotice() }}</p>
                 </div>
               </div>
-              <button class="action-button" @click="sendWeatherNotification">📩 날씨 문자 보내기</button>
+              <button class="action-button" type="button" @click="sendWeatherNotification">
+                📩 날씨 문자 보내기
+              </button>
             </div>
           </div>
         </div>
@@ -139,13 +152,15 @@ const allSchedules = ref([]);
 const debugTemp = ref(26);
 const debugPrecip = ref(0.2);
 const currentTime = ref("");
-const isLoading = ref(true); // 로딩 상태 추가
+const isLoading = ref(true);
+const isSending = ref(false); // 로딩 상태 추가
+const keepNotificationText = ref(false); // 전송 후 메시지 유지 여부
 
 onMounted(async () => {
-  await fetchAllSchedules(); // 비동기 호출 대기
+  await fetchAllSchedules();
   updateCurrentTime();
   setInterval(updateCurrentTime, 60000);
-  isLoading.value = false; // 데이터 로드 후 로딩 해제
+  isLoading.value = false;
 });
 
 const recentSchedules = computed(() => {
@@ -159,7 +174,7 @@ const recentSchedules = computed(() => {
   fourDaysLater.setDate(today.getDate() + 3);
 
   const filteredSchedules = allSchedules.value
-    .filter(schedule => {
+    .filter((schedule) => {
       const scheduleDate = new Date(schedule.datetime);
       const isWithinRange = scheduleDate >= today && scheduleDate <= fourDaysLater;
       console.log(`일정 필터링: ${schedule.datetime}, 범위 내: ${isWithinRange}`);
@@ -204,7 +219,7 @@ const updateSchedulesBasedOnWeather = async (temperature, precipitation) => {
     console.log("변경된 스케줄 응답:", response.data);
 
     if (response.data && Array.isArray(response.data.items) && response.data.items.length > 0) {
-      changedSchedules.value = response.data.items.map(s => ({
+      changedSchedules.value = response.data.items.map((s) => ({
         datefcst: s.datefcst,
         minutes: s.minutes,
         program: s.program,
@@ -213,10 +228,13 @@ const updateSchedulesBasedOnWeather = async (temperature, precipitation) => {
         teacher: s.teacher,
         weather_reason: s.weather_reason,
       }));
-      weatherNotificationText.value = response.data.message || "변경된 스케줄이 있습니다.";
+      weatherNotificationText.value =
+        response.data.message || "변경된 스케줄이 있습니다.";
     } else {
       changedSchedules.value = [];
-      weatherNotificationText.value = response.data.message || "안녕하세요, 학부모님!\n\n현재 날씨에 따라 변경된 스케줄이 없습니다. 아이들이 평소처럼 즐겁게 지낼 예정이에요.\n\n감사합니다!";
+      weatherNotificationText.value =
+        response.data.message ||
+        "안녕하세요, 학부모님!\n\n현재 날씨에 따라 변경된 스케줄이 없습니다. 아이들이 평소처럼 즐겁게 지낼 예정이에요.\n\n감사합니다!";
     }
 
     for (const schedule of changedSchedules.value) {
@@ -225,7 +243,8 @@ const updateSchedulesBasedOnWeather = async (temperature, precipitation) => {
     await fetchAllSchedules();
   } catch (error) {
     console.error("변경된 스케줄 가져오기 실패:", error);
-    weatherNotificationText.value = "변경된 스케줄을 가져오지 못했습니다. 백엔드 오류를 확인해주세요.";
+    weatherNotificationText.value =
+      "변경된 스케줄을 가져오지 못했습니다. 백엔드 오류를 확인해주세요.";
     changedSchedules.value = [];
   }
 };
@@ -244,31 +263,41 @@ const updateScheduleInDB = async (schedule) => {
 
 const generateChangeNotice = () => {
   let notice = "학부모님께,\n\n아래와 같이 수업 일정이 변경되었습니다:\n";
-  changedSchedules.value.forEach(s => {
-    notice += `- ${formatDateSimple(s.datefcst)} ${s.program}: ${s.originalIsOutside ? '실외' : '실내'} → ${s.isoutside ? '실외' : '실내'} (${s.weather_reason})\n`;
+  changedSchedules.value.forEach((s) => {
+    notice += `- ${formatDateSimple(s.datefcst)} ${s.program}: ${
+      s.originalIsOutside ? "실외" : "실내"
+    } → ${s.isoutside ? "실외" : "실내"} (${s.weather_reason})\n`;
   });
   notice += "\n감사합니다.\nJellybean Letter";
   return notice;
 };
 
-const sendManualNotification = async () => {
+const sendManualNotification = async (event) => {
+  event.preventDefault(); // 새로고침 방지
   if (!notificationText.value) {
     alert("⚠️ 수동 메시지가 없습니다!");
     return;
   }
+  isSending.value = true;
   try {
     const res = await api.post("/schedule/api/send_line", {
       message: notificationText.value,
       user_id: "Uaecc6981aace6cd3c6788ffb6019f1ff",
     });
     alert(`📩 ${res.data.message}`);
-    notificationText.value = "";
+    if (!keepNotificationText.value) {
+      notificationText.value = ""; // 체크박스가 꺼져 있을 때만 초기화
+    }
   } catch (error) {
     alert("📩 전송 실패!");
+    console.error("수동 문자 전송 실패:", error);
+  } finally {
+    isSending.value = false;
   }
 };
 
-const sendWeatherNotification = async () => {
+const sendWeatherNotification = async (event) => {
+  event.preventDefault(); // 새로고침 방지 (날씨 문자 보내기에도 적용)
   if (!weatherNotificationText.value) {
     alert("⚠️ 날씨 메시지가 없습니다!");
     return;
@@ -280,7 +309,8 @@ const sendWeatherNotification = async () => {
     });
     alert(`📩 ${res.data.message}`);
   } catch (error) {
-    alert("📩 전송 실패!");
+    alert("📩 전송 personally!");
+    console.error("날씨 문자 전송 실패:", error);
   }
 };
 
@@ -307,8 +337,8 @@ const formatDateSimple = (dateString) => {
 }
 
 .logo {
-  font-family: 'Poppins', sans-serif;
-  font-size: 2.5rem; /* 원래 크기로 복구 */
+  font-family: "Poppins", sans-serif;
+  font-size: 2.5rem;
   font-weight: 700;
   background: linear-gradient(45deg, #ff6f61, #ffb88c);
   -webkit-background-clip: text;
@@ -329,9 +359,10 @@ const formatDateSimple = (dateString) => {
   gap: 20px;
 }
 
-.left-section, .right-section {
+.left-section,
+.right-section {
   flex: 1;
-  min-width: 0; /* flex 아이템 축소 가능 */
+  min-width: 0;
 }
 
 .vertical-divider {
@@ -388,12 +419,7 @@ const formatDateSimple = (dateString) => {
   color: #4a4a4a;
   margin-bottom: 15px;
 }
-/*
-.table-wrapper {
-  max-height: 300px;
-  overflow-y: auto;
-}
-*/
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -401,7 +427,8 @@ table {
   table-layout: fixed;
 }
 
-th, td {
+th,
+td {
   border: 1px solid #ddd;
   padding: 10px;
   text-align: left;
@@ -450,13 +477,6 @@ td {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.no-changes {
-  font-size: 1rem;
-  color: #4a4a4a;
-  text-align: center;
-  margin-top: 10px;
-}
-
 .action-button {
   margin-top: 15px;
   padding: 12px 20px;
@@ -470,7 +490,11 @@ td {
   text-align: center;
 }
 
-/* 반응형 디자인 */
+.action-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
 @media (max-width: 768px) {
   .content-container {
     flex-direction: column;
