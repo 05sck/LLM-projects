@@ -1,4 +1,5 @@
-from app.routes import attendance, medication, root, schedule, students, test
+from app.routes import (attendance, medication, root, schedule, students, test,
+                        weather)
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -18,6 +19,7 @@ app.include_router(students.router)
 app.include_router(attendance.router)
 app.include_router(schedule.router)
 app.include_router(medication.router)
+app.include_router(weather.router)  # weather 라우터 추가
 
 '''
 # Stremalit 앱으로 진입. UI 레이아웃과 흐름을 정의.

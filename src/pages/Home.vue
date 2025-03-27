@@ -126,12 +126,34 @@ const outdoorSchedules = computed(() => {
     .sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
 });
 
+// 날씨 상태 변환 함수
+const getWeatherDescription = (skyCode) => {
+  switch (skyCode) {
+    case '1': return '맑음';
+    case '3': return '구름많음';
+    case '4': return '흐림';
+    default: return '알 수 없음';
+  }
+};
+
 onMounted(async () => {
   try {
     const res = await api.get("http://127.0.0.1:8000/");
     totalStudents.value = res.data.total_students;
   } catch (error) {
     console.error("Root fetch failed:", error);
+  }
+
+  // 날씨 데이터 가져오기
+  try {
+    const weatherResponse = await api.get("http://127.0.0.1:8000/weather", {
+      params: { nx: 62, ny: 126 } // 서울 좌표 예시
+    });
+    weather.value.temperature = weatherResponse.data.temperature;
+    weather.value.description = getWeatherDescription(weatherResponse.data.sky);
+  } catch (error) {
+    console.error("날씨 데이터 불러오기 실패:", error);
+    weather.value.description = "날씨 정보 없음";
   }
 
   try {
