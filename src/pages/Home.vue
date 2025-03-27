@@ -287,11 +287,11 @@ const formatDateSimple = (dateString) => {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
 }
-
+/*
 .card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 10px rgba(255, 111, 97, 0.2);
-}
+}*/
 
 h3 {
   font-size: 1.2rem;
@@ -316,12 +316,12 @@ h3 {
   flex-direction: column;
   gap: 20px;
 }
-
+/*
 .schedule:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 10px rgba(255, 111, 97, 0.2);
 }
-
+*/
 .all-schedules,
 .changed-schedules {
   margin-top: 10px;
