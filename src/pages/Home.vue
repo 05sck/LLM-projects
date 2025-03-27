@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard">
-    <div class="logo-container">
+    <div class="logo-container" :class="{ 'fade-out': !isIntro }">
       <h1>🫘 Jellybean Letter</h1>
       <p class="intro">
         유치원 선생님을 위한 알림 자동화 서비스입니다.<br>
@@ -9,82 +9,85 @@
       </p>
     </div>
 
-    <div v-if="!isIntro" class="content">
+    <div v-if="!isIntro" class="content" :class="{ 'fade-in': !isIntro }">
+      <h2 class="content-logo">🫘 Jellybean Letter</h2>
       <div class="horizontal-layout">
-        <!-- 학생 수 -->
-        <div class="card">
-          <h3>👦 전체 학생 수</h3>
-          <p>{{ totalStudents }} 명</p>
+        <div class="left-column">
+          <!-- 학생 수 -->
+          <div class="card">
+            <h3>👦 전체 학생 수</h3>
+            <p>{{ totalStudents }} 명</p>
+          </div>
+
+          <!-- 날씨 정보 -->
+          <div class="card">
+            <h3>🌤️ 현재 날씨</h3>
+            <p>{{ weather.temperature }}°C</p>
+            <p>{{ weather.description }}</p>
+          </div>
         </div>
 
-        <!-- 날씨 정보 -->
-        <div class="card">
-          <h3>🌤️ 현재 날씨</h3>
-          <p>{{ weather.temperature }}°C</p>
-          <p>{{ weather.description }}</p>
-        </div>
-
-        <!-- 주간 일정 -->
+        <!-- 주간 일정 (실외 일정과 변경된 스케줄만 표시) -->
         <div class="schedule">
-          <h2>🗓 이번 주 일정</h2>
-          <ul>
-            <li v-for="event in weeklySchedule" :key="event.id">
-              {{ event.date }} - {{ event.name }}
-            </li>
-          </ul>
+          <!-- 실외 일정 섹션 -->
+          <div class="all-schedules">
+            <h3>📅 실외 일정 (최근 4일)</h3>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>날짜</th>
+                    <th>시간</th>
+                    <th>프로그램</th>
+                    <th>실외</th>
+                    <th>교사</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-if="outdoorSchedules.length === 0">
+                    <td colspan="5">최근 4일간 실외 일정 없음</td>
+                  </tr>
+                  <tr v-else v-for="schedule in outdoorSchedules" :key="schedule.datetime">
+                    <td>{{ formatDateSimple(schedule.datetime) }}</td>
+                    <td>{{ schedule.minutes }}</td>
+                    <td>{{ schedule.program }}</td>
+                    <td>{{ schedule.isoutside ? '예' : '아니오' }}</td>
+                    <td>{{ schedule.teacher }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 변경된 스케줄 섹션 -->
+          <div class="changed-schedules" v-if="changedSchedules.length">
+            <h3>🔄 변경된 야외 스케줄</h3>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>날짜</th>
+                    <th>시간</th>
+                    <th>프로그램</th>
+                    <th>야외</th>
+                    <th>교사</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="schedule in changedSchedules" :key="schedule.datetime">
+                    <td>{{ formatDateSimple(schedule.datetime) }}</td>
+                    <td>{{ schedule.minutes }}</td>
+                    <td>{{ schedule.program }}</td>
+                    <td>{{ schedule.isoutside ? '예' : '아니오' }}</td>
+                    <td>{{ schedule.teacher }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <p v-else class="no-changes">🔄 변경된 스케줄이 없습니다.</p>
         </div>
       </div>
-
-      <!-- 전체 스케줄 섹션 (실외만 표시) -->
-      <div class="all-schedules">
-        <h2>📅 실외 일정 (최근 4일)</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>날짜</th>
-              <th>시간 (분)</th>
-              <th>프로그램</th>
-              <th>실외 여부</th>
-              <th>담당 교사</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="schedule in outdoorSchedules" :key="schedule.datetime">
-              <td>{{ formatDate(schedule.datetime) }}</td>
-              <td>{{ schedule.minutes }}</td>
-              <td>{{ schedule.program }}</td>
-              <td>{{ schedule.isoutside ? '예' : '아니오' }}</td>
-              <td>{{ schedule.teacher }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- 변경된 스케줄 섹션 -->
-      <div class="changed-schedules" v-if="changedSchedules.length">
-        <h2>🔄 변경된 야외 스케줄</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>날짜</th>
-              <th>시간 (분)</th>
-              <th>프로그램</th>
-              <th>야외 여부</th>
-              <th>담당 교사</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="schedule in changedSchedules" :key="schedule.datetime">
-              <td>{{ formatDate(schedule.datetime) }}</td>
-              <td>{{ schedule.minutes }}</td>
-              <td>{{ schedule.program }}</td>
-              <td>{{ schedule.isoutside ? '예' : '아니오' }}</td>
-              <td>{{ schedule.teacher }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p v-else class="no-changes">🔄 변경된 스케줄이 없습니다.</p>
 
       <div class="button-container">
         <router-link to="/schedule" @click="logClick('Schedule')" class="action-button primary">
@@ -109,11 +112,10 @@ const changedSchedules = ref([]);
 const allSchedules = ref([]);
 const isIntro = ref(true);
 
-// 오늘부터 4일간의 실외 일정 필터링
 const outdoorSchedules = computed(() => {
   const today = new Date();
   const fourDaysLater = new Date(today);
-  fourDaysLater.setDate(today.getDate() + 3); // 오늘 포함 4일
+  fourDaysLater.setDate(today.getDate() + 3);
 
   return allSchedules.value
     .filter(schedule => schedule.isoutside === 1)
@@ -121,7 +123,7 @@ const outdoorSchedules = computed(() => {
       const scheduleDate = new Date(schedule.datetime);
       return scheduleDate >= today && scheduleDate <= fourDaysLater;
     })
-    .sort((a, b) => new Date(a.datetime) - new Date(b.datetime)); // 날짜순 정렬
+    .sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
 });
 
 onMounted(async () => {
@@ -132,16 +134,13 @@ onMounted(async () => {
     console.error("Root fetch failed:", error);
   }
 
-  // 전체 스케줄 가져오기
   try {
     const response = await api.get("http://127.0.0.1:8000/schedule/api/schedules");
-    console.log("받은 데이터:", response.data); // 디버깅용
     allSchedules.value = response.data;
   } catch (error) {
     console.error("전체 스케줄 불러오기 실패:", error);
   }
 
-  // 변경된 스케줄 가져오기
   try {
     const response = await api.get("http://127.0.0.1:8000/schedule/api/changed-schedules", {
       params: { nx: 62, ny: 126 },
@@ -160,10 +159,9 @@ const logClick = (page) => {
   console.log(`${page} 버튼이 클릭되었습니다.`);
 };
 
-const formatDate = (dateString) => {
+const formatDateSimple = (dateString) => {
   const date = new Date(dateString);
   return date.toLocaleString("ko-KR", {
-    year: "numeric",
     month: "2-digit",
     day: "2-digit",
     hour: "2-digit",
@@ -174,30 +172,29 @@ const formatDate = (dateString) => {
 
 <style scoped>
 .dashboard {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* 처음 로고와 안내문 중앙 정렬 */
+  align-items: center; /* 수평 중앙 정렬 */
+  min-height: 100vh; /* 전체 화면 높이 */
   padding: 25px;
   max-width: 1200px;
   margin: 0 auto;
   font-family: 'Noto Sans KR', sans-serif;
-  position: relative;
-  min-height: 100vh;
-}
-
-.dashboard {
-  padding: 25px;
-  max-width: 1200px;
-  margin: 0 auto;
-  font-family: 'Noto Sans KR', sans-serif;
-  position: relative;
 }
 
 .logo-container {
   text-align: center;
-  margin-bottom: 40px;
+  transition: opacity 0.5s ease;
+}
+
+.logo-container.fade-out {
+  opacity: 0;
 }
 
 .logo-container h1 {
   font-family: 'Poppins', sans-serif;
-  font-size: 4rem;
+  font-size: 6rem;
   font-weight: 700;
   background: linear-gradient(45deg, #ff6f61, #ffb88c);
   -webkit-background-clip: text;
@@ -213,13 +210,152 @@ const formatDate = (dateString) => {
   color: #4a4a4a;
   line-height: 1.6;
   margin-top: 20px;
-  margin-bottom: 20px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  width: 100%;
+  position: relative;
+  top: -94px; /* 전체 콘텐츠를 2.5cm(약 94px) 위로 이동 */
+}
+
+.content.fade-in {
+  opacity: 1;
+}
+
+.content-logo {
+  font-family: 'Poppins', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(45deg, #ff6f61, #ffb88c);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-align: center;
+  position: absolute; /* 최상단 고정 */
+  top: -60px; /* 콘텐츠 상단에서 약간 위로 */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+}
+
+.horizontal-layout {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+}
+
+.card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(255, 111, 97, 0.2);
+}
+
+h3 {
+  font-size: 1.2rem;
+  color: #4a4a4a;
+  margin-bottom: 10px;
+}
+
+.card p {
+  font-size: 1.2rem;
+  color: #ff6f61;
+  font-weight: 500;
+}
+
+.schedule {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  padding: 20px;
+  border-radius: 12px;
+  flex: 3;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.schedule:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(255, 111, 97, 0.2);
+}
+
+.all-schedules,
+.changed-schedules {
+  margin-top: 10px;
+}
+
+.all-schedules h3,
+.changed-schedules h3 {
+  font-size: 1.4rem;
+  color: #4a4a4a;
+  margin-bottom: 10px;
+}
+
+.table-wrapper {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1rem;
+}
+
+th, td {
+  border: 1px solid #e0e0e0;
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background-color: #ff6f61;
+  color: white;
+  font-weight: 600;
+}
+
+td {
+  color: #4a4a4a;
+}
+
+tbody tr:hover {
+  background-color: #fff5f5;
+  transition: background-color 0.2s ease;
+}
+
+.no-changes {
+  font-size: 1rem;
+  color: #4a4a4a;
+  text-align: center;
+  margin-top: 10px;
 }
 
 .button-container {
   display: flex;
   justify-content: center;
   gap: 20px;
+  margin-top: 30px;
 }
 
 .action-button {
@@ -230,8 +366,8 @@ const formatDate = (dateString) => {
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
-  text-decoration: none; /* 링크 기본 스타일 제거 */
-  display: inline-block; /* 링크를 버튼처럼 보이게 */
+  text-decoration: none;
+  display: inline-block;
 }
 
 .action-button.primary {
@@ -257,91 +393,35 @@ const formatDate = (dateString) => {
   box-shadow: 0 4px 10px rgba(255, 111, 97, 0.2);
 }
 
-.content {
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-}
-
-.horizontal-layout {
-  display: flex;
-  gap: 20px;
-  justify-content: space-between;
-  flex-wrap: nowrap;
-}
-
-.card,
-.schedule {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-  padding: 20px;
-  border-radius: 12px;
-  flex: 1;
-  text-align: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-  min-width: 0;
-}
-
-.card:hover,
-.schedule:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(255, 111, 97, 0.2);
-}
-
-h3 {
-  font-size: 1.2rem;
-  color: #4a4a4a;
-  margin-bottom: 10px;
-}
-
-.card p {
-  font-size: 1.2rem;
-  color: #ff6f61;
-  font-weight: 500;
-}
-
-.schedule h2 {
-  font-size: 1.5rem;
-  color: #4a4a4a;
-  margin-bottom: 15px;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-  max-height: 150px;
-  overflow-y: auto;
-}
-
-.schedule ul li {
-  font-size: 1rem;
-  color: #4a4a4a;
-  margin: 8px 0;
-  padding: 8px 12px;
-  border-radius: 8px;
-  background-color: #ffffff;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-}
-
-.schedule ul li:hover {
-  color: #ff6f61;
-  background-color: #fff5f5;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(255, 111, 97, 0.2);
-}
-
 @media (max-width: 768px) {
   .dashboard {
     padding: 15px;
   }
 
   .logo-container h1 {
-    font-size: 2.5rem;
+    font-size: 4rem;
+  }
+
+  .content-logo {
+    font-size: 2rem;
+    top: -50px; /* 모바일에서 조금 더 위로 */
+  }
+
+  .content {
+    top: -70px; /* 모바일에서 약간 덜 올리기 */
   }
 
   .intro {
     font-size: 1.1rem;
+  }
+
+  .horizontal-layout {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .schedule {
+    flex: 1;
   }
 
   .button-container {
@@ -353,87 +433,12 @@ ul {
     width: 100%;
   }
 
-  .horizontal-layout {
-    flex-direction: column;
-    gap: 15px;
-  }
-}
-
-.all-schedules {
-  margin-top: 30px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-}
-
-.all-schedules:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(255, 111, 97, 0.2);
-}
-
-.all-schedules h2 {
-  font-size: 1.5rem;
-  color: #4a4a4a;
-  margin-bottom: 15px;
-}
-
-.changed-schedules {
-  margin-top: 30px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-}
-
-.changed-schedules:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(255, 111, 97, 0.2);
-}
-
-.changed-schedules h2 {
-  font-size: 1.5rem;
-  color: #4a4a4a;
-  margin-bottom: 15px;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th, td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-}
-
-th {
-  background-color: #f2f2f2;
-  font-weight: 600;
-  color: #4a4a4a;
-}
-
-.no-changes {
-  margin-top: 20px;
-  font-size: 1.1rem;
-  color: #4a4a4a;
-  text-align: center;
-}
-
-@media (max-width: 768px) {
-  .all-schedules, .changed-schedules {
-    margin-top: 15px;
-  }
-
   table {
     font-size: 0.9rem;
   }
 
   th, td {
-    padding: 6px;
+    padding: 8px;
   }
 }
 </style>
