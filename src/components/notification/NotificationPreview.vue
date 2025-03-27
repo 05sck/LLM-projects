@@ -7,9 +7,9 @@
       </ul>
     </div>
     <div class="section message-section">
-      <h3>📢 생성된 보고서</h3>
+      <h3 v-if="title">{{ title }}</h3>
       <p v-if="message" class="message-text">{{ message }}</p>
-      <p v-else class="empty-message">❌ 보고서가 생성되지 않았습니다.</p>
+      <p v-else class="empty-message">❌ 메시지가 없습니다.</p>
     </div>
   </div>
 </template>
@@ -18,6 +18,7 @@
 defineProps({
   message: String,
   processLog: Array,
+  title: String, // 새로 추가된 prop
 });
 </script>
 

@@ -109,47 +109,62 @@ class WeatherActivityAdvisor:
         df_rule['TMPrule1'], df_rule['TMPrule2'] = 3, 30
         df_rule['WSDrule'], df_rule['PCPrule'], df_rule['SNOrule'] = 10, 3, 2
 
-        df_weather['isoutside'] = np.where(
-            (df_weather['TMP'] < df_rule['TMPrule1']) | (df_weather['TMP'] > df_rule['TMPrule2']) |
-            (df_weather['WSD'] > df_rule['WSDrule']) | (df_weather['PCP'] > df_rule['PCPrule']) |
-            (df_weather['SNO'] > df_rule['SNOrule']), True, False)
+        # 다단계 기준 적용, 더 촘촘한 기준으로 변경
+        df_weather['isoutside'] = True  # 기본적으로 실외
+        conditions = [
+                (df_weather['TMP'] < df_rule['TMPrule1']),
+                (df_weather['TMP'] > df_rule['TMPrule2']),
+                (df_weather['WSD'] > df_rule['WSDrule']),
+                (df_weather['PCP'] > df_rule['PCPrule']),
+                (df_weather['SNO'] > df_rule['SNOrule']),
+                (df_weather['TMP'] >= 25),
+                (df_weather['PCP'] >= 0.5),
+            ]
+        for cond in conditions:
+            df_weather.loc[cond, 'isoutside'] = False
 
-        df_weather_outside = df_weather[['datefcst', 'isoutside']].copy()  # .copy() 추가
-        df_weather_outside.loc[:, 'datefcst'] = pd.to_datetime(df_weather_outside['datefcst'])  # .loc 사용
+        df_weather_outside = df_weather[['datefcst', 'isoutside', 'TMP', 'PCP']].copy()
+        df_weather_outside['datefcst'] = pd.to_datetime(df_weather_outside['datefcst'])
 
-        df_schedule = pd.read_csv(BASE_DIR / 'kindergarten_schedule.csv')
-        df_schedule.rename(columns={'datetime': 'datefcst'}, inplace=True)
-        df_schedule_outside = df_schedule[df_schedule['isoutside'] == True].copy()  # .copy() 추가
-        df_schedule_outside.loc[:, 'datefcst'] = pd.to_datetime(df_schedule_outside['datefcst']).dt.round('h')  # 'H'를 'h'로 변경, .loc 사용
-        print(f"Loaded CSV: {df_schedule.to_string()}")
-        print(f"df_weather_outside: {df_weather_outside.head().to_string()}")
-        print(f"df_schedule_outside: {df_schedule_outside.head().to_string()}")
-        changed_schedules = pd.merge(df_weather_outside, df_schedule_outside, on=['datefcst', 'isoutside'], how='inner')
-        print(f"merged result: {changed_schedules.head().to_string()}")
-        print(f"변경된 스케줄 수: {len(changed_schedules)}")
-        return changed_schedules.to_dict(orient='records') if not changed_schedules.empty else []
+        # MySQL에서 스케줄 가져오기
+        df_schedule = pd.DataFrame(get_kindergarten_schedule())
+        df_schedule['datefcst'] = pd.to_datetime(df_schedule['datetime']).dt.round('h')
+        df_schedule['original_isoutside'] = df_schedule['isoutside']  # 원래 상태 저장
+
+        # 변경된 스케줄 탐지
+        changed_schedules = pd.merge(df_weather_outside, df_schedule, on='datefcst', how='inner')
+        changed_schedules = changed_schedules[changed_schedules['isoutside_x'] != changed_schedules['isoutside_y']]
+        changed_schedules['weather_reason'] = changed_schedules.apply(
+            lambda row: f"온도 {row['TMP']}°C, 강수량 {row['PCP']}mm로 인해 {'실내' if not row['isoutside_x'] else '실외'}로 변경", 
+        axis=1
+    )
+        
+
+        result = changed_schedules.rename(columns={
+        'isoutside_x': 'isoutside',  # 변경 후 상태
+        'isoutside_y': 'originalIsOutside'  # 원래 상태
+        })[['datefcst', 'minutes', 'program', 'isoutside', 'originalIsOutside', 'teacher', 'weather_reason']]
+        print(f"변경된 스케줄 수: {len(result)}")
+        return result.to_dict(orient='records') if not result.empty else []
 
 def generate_gemini_message(changed_schedules):
     if not changed_schedules:
         return "변경된 일정이 없습니다."
     prompt = f"""
+    너는 유치원 선생님이야. 학부모님께 안내 문자를 보내야 하는 상황이야. 어투는 ~해요 체를 쓰고, 친근하게 써줘.
     다음은 날씨로 인해 변경된 유치원 스케줄입니다:
     {pd.DataFrame(changed_schedules).to_string()}
     학부모님께 보내는 친근한 안내 메시지를 작성해줘.
     """
-    sys_instruct = """너는 유치원 선생님이야. 학부모님께 안내 문자를 보내야 하는 상황이야. 어투는 ~해요 체를 쓰고, 친근하게 써줘."""
     print(f"Gemini에 보내는 프롬프트: {prompt}")
     try:
         print("Gemini API 호출 시작")
-        response = model.generate_content(
-            contents=prompt,
-            generation_config={"system_instruction": sys_instruct}
-        )
+        response = model.generate_content(prompt)  # system_instruction 제거
         print(f"Gemini 응답: {response.text}")
         return response.text
     except Exception as e:
         print(f"Gemini API 오류: {str(e)}")
-        return f"오류: {str(e)}"
+        return f"변경된 일정 안내:\n{pd.DataFrame(changed_schedules).to_string()}"
 
 def get_changed_schedules(nx: int = 62, ny: int = 126):
     print("get_changed_schedules 시작")
@@ -159,7 +174,11 @@ def get_changed_schedules(nx: int = 62, ny: int = 126):
     print("날씨 데이터 처리 시작")
     advisor.process_weather_data()
     print("의사결정 시작")
-    changed_schedules = advisor.decision_making()
+    try:
+        changed_schedules = advisor.decision_making()
+    except Exception as e:
+        print(f"의사결정 오류: {str(e)}")
+        changed_schedules = []
     print(f"변경된 스케줄: {changed_schedules}")
     print("Gemini 메시지 생성 시작")
     message = generate_gemini_message(changed_schedules)
