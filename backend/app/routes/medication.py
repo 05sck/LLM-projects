@@ -51,12 +51,13 @@ class MedicationRequest(BaseModel):
 
 @router.post("/api/send_line")
 async def send_medication_line(request: MedicationRequest):
-    enhanced_message = process_medication_rag(
+    result = process_medication_rag(
         request.child_name,
         request.med_name,
         request.condition,
         request.med_info
     )
+    enhanced_message = result["message"]  # 딕셔너리에서 문자열 추출
     line_send_message.send_line_message(CHANNEL_ACCESS_TOKEN, request.line_id, enhanced_message)
     return {"message": enhanced_message}
 

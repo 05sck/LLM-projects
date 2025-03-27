@@ -1,4 +1,6 @@
 # backend/app/routes/schedule.py
+import os
+
 from app.services import db_service, line_send_message
 from app.services.automation_api import get_changed_schedules  # 새로 추가
 from app.services.automation_api import get_kindergarten_schedule

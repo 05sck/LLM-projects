@@ -1,11 +1,12 @@
 <template>
   <div class="medication-page">
     <div class="chat-container">
-      <h1 class="page-title">📋 복약 보고서 생성기</h1>
+      <!-- Jellybean Letter 로고 -->
+      <h2 class="content-logo">🫘 Jellybean Letter</h2>
       <div class="content-wrapper">
         <!-- 보고서 입력 -->
         <div class="input-section">
-          <p class="subtitle">보고서 입력</p>
+          <p class="subtitle">✍️ <strong>보고서 입력</strong></p>
           <div class="chat-box">
             <div class="chat-message bot">
               <span>아이 이름이 무엇인가요?</span>
@@ -35,7 +36,7 @@
 
         <!-- 보고서 생성 결과 -->
         <div class="output-section">
-          <p class="subtitle">생성된 보고서</p>
+          <p class="subtitle">📄 <strong>복약 보고 안내문</strong></p>
           <div class="output-box" v-if="isLoading || reportGenerated">
             <div class="output-content">
               <span v-if="isLoading || reportGenerated">
@@ -51,12 +52,15 @@
                   </div>
                 </div>
               </div>
-              <span v-if="reportGenerated">복약 보고서를 생성합니다</span>
+              <!-- '복약 보고서를 생성합니다'를 별도 div로 분리 -->
+              <div v-if="reportGenerated" class="report-generation">
+                <span>복약 보고서를 생성합니다</span>
+              </div>
               <p v-if="notificationText" class="report-text">{{ notificationText }}</p>
-            </div>
-            <button v-if="reportGenerated" class="send-btn" @click="sendNotification">
+              <button v-if="reportGenerated" class="send-btn" @click="sendNotification">
               📩 생성된 보고서 기반으로 문자 보내기
             </button>
+            </div>
           </div>
         </div>
       </div>
@@ -65,7 +69,6 @@
 </template>
 
 <script setup>
-// 스크립트 부분은 그대로 유지
 import api from "@/modules/axios.js";
 import { ref } from "vue";
 
@@ -123,8 +126,11 @@ const sendNotification = async () => {
   }
   try {
     const res = await api.post("/api/send_line", {
-      message: notificationText.value,
-      user_id: "Uaecc6981aace6cd3c6788ffb6019f1ff",
+      child_name: childName.value,
+      med_name: medName.value,
+      condition: condition.value,
+      med_info: medInfo.value, // 이미 배열 형태
+      line_id: "Uaecc6981aace6cd3c6788ffb6019f1ff",
     });
     alert(`📩 ${res.data.message}`);
     resetForm();
@@ -162,22 +168,32 @@ const resetForm = () => {
   flex: 1;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
-.page-title {
-  font-size: 2rem;
-  color: #4a4a4a;
-  font-weight: 600;
-  text-shadow: 1px 1px 3px rgba(255, 111, 97, 0.1);
-  margin-bottom: 20px;
+/* Jellybean Letter 로고 스타일 */
+.content-logo {
+  font-family: 'Poppins', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(45deg, #ff6f61, #ffb88c);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
   text-align: center;
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
 }
 
 .content-wrapper {
   display: flex;
   gap: 40px;
   flex: 1;
-  height: calc(100% - 80px);
+  margin-top: 60px; /* 로고와 겹치지 않도록 상단 여백 추가 */
+  height: calc(100% - 230px); /* 로고와 여백을 고려한 높이 조정 */
 }
 
 .input-section, .output-section {
@@ -296,7 +312,7 @@ const resetForm = () => {
   display: flex;
   gap: 15px;
   margin-top: 10px;
-  height: 100px; /* 고정 높이 설정 */
+  height: 100px;
 }
 
 .log-item {
@@ -307,8 +323,8 @@ const resetForm = () => {
   font-size: 0.9rem;
   color: #333;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  overflow-y: auto; /* 내용이 넘칠 경우 스크롤 */
-  height: 100%; /* 부모 높이를 따름 */
+  overflow-y: auto;
+  height: 100%;
 }
 
 .report-text {
@@ -316,8 +332,9 @@ const resetForm = () => {
   color: #333;
   white-space: pre-wrap;
 }
+
 .report-generation {
-  margin-top: 10px;
+  margin-top: 15px;
   font-size: 1rem;
   color: #ff6f61;
   font-weight: 500;
@@ -340,5 +357,31 @@ const resetForm = () => {
   background-color: #e65a50;
   transform: scale(1.05);
   box-shadow: 0 4px 10px rgba(255, 111, 97, 0.3);
+}
+
+@media (max-width: 768px) {
+  .medication-page {
+    padding: 20px;
+  }
+
+  .content-logo {
+    font-size: 2rem;
+    top: -30px;
+  }
+
+  .content-wrapper {
+    flex-direction: column;
+    margin-top: 40px; /* 모바일에서 조정 */
+    height: calc(100% - 200px); /* 모바일에서 높이 조정 */
+  }
+
+  .chat-input {
+    font-size: 0.9rem;
+  }
+
+  .generate-btn, .send-btn {
+    font-size: 1rem;
+    padding: 10px 15px;
+  }
 }
 </style>
