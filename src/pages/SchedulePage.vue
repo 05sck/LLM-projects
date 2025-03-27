@@ -86,52 +86,42 @@
 
           <!-- 탭 2: 날씨 기반 자동 안내문 생성기 -->
           <div v-if="activeTab === 'weather'" class="tab-content">
-            <div class="section">
-              <h2>🌤️ 디버깅용 날씨 입력</h2>
-              <p>현재 시각: {{ currentTime }}</p>
-              <input v-model.number="debugTemp" type="number" placeholder="온도 (°C)" />
-              <input v-model.number="debugPrecip" type="number" step="0.1" placeholder="강수량 (mm)" />
-              <button @click="updateSchedulesBasedOnWeather(debugTemp, debugPrecip)">
-                오후 5시 시뮬레이션
-              </button>
-            </div>
-            <div class="section">
-              <h2>🌤️ 날씨 & 변경되는 일정</h2>
-              <NotificationPreview :message="weatherNotificationText" />
-              <div v-if="changedSchedules.length" class="report-section">
-                <h3>🔄 변경된 일정</h3>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>날짜</th>
-                      <th>시간</th>
-                      <th>프로그램</th>
-                      <th>원래</th>
-                      <th>변경 후</th>
-                      <th>사유</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="s in changedSchedules" :key="s.datefcst">
-                      <td>{{ formatDateSimple(s.datefcst) }}</td>
-                      <td>{{ s.minutes }}</td>
-                      <td>{{ s.program }}</td>
-                      <td>{{ s.originalIsOutside ? '실외' : '실내' }}</td>
-                      <td>{{ s.isoutside ? '실외' : '실내' }}</td>
-                      <td>{{ s.weather_reason }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-                <div class="change-notice">
-                  <h3>📝 수업 일정 변경 안내</h3>
-                  <p>{{ generateChangeNotice() }}</p>
-                </div>
-              </div>
-              <button class="action-button" type="button" @click="sendWeatherNotification">
-                📩 날씨 문자 보내기
-              </button>
-            </div>
+          <div class="section">
+            <h2>🌤️ 디버깅용 날씨 입력</h2>
+            <p>현재 시각: {{ currentTime }}</p>
+            <input v-model.number="debugTemp" type="number" placeholder="온도 (°C)" />
+            <input v-model.number="debugPrecip" type="number" step="0.1" placeholder="강수량 (mm)" />
+            <button @click="updateSchedulesBasedOnWeather(debugTemp, debugPrecip)">
+              오후 5시 시뮬레이션
+            </button>
           </div>
+          <div class="section">
+            <h2>🌤️ 날씨 & 변경되는 일정</h2>
+            <NotificationPreview :message="weatherNotificationText" />
+            <div class="weather-table-section">
+              <h3>🌡️ 현재 날씨 정보</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>온도 (°C)</th>
+                    <th>강수량 (mm)</th>
+                    <th>업데이트 시각</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ debugTemp }}</td>
+                    <td>{{ debugPrecip }}</td>
+                    <td>{{ currentTime }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <button class="action-button" type="button" @click="sendWeatherNotification">
+              📩 날씨 문자 보내기
+            </button>
+          </div>
+        </div>
         </div>
       </div>
     </div>
@@ -211,41 +201,50 @@ const updateNotificationText = (message) => {
 
 const updateSchedulesBasedOnWeather = async (temperature, precipitation) => {
   try {
-    console.log("변경된 스케줄 요청 시작:", { nx: 62, ny: 126 });
+    isLoading.value = true;
     const response = await api.get("/schedule/api/changed-schedules", {
       params: { nx: 62, ny: 126 },
       timeout: 30000,
     });
-    console.log("변경된 스케줄 응답:", response.data);
+    console.log("백엔드 응답:", response.data);
 
     if (response.data && Array.isArray(response.data.items) && response.data.items.length > 0) {
-      changedSchedules.value = response.data.items.map((s) => ({
-        datefcst: s.datefcst,
-        minutes: s.minutes,
-        program: s.program,
-        isoutside: s.isoutside,
-        originalIsOutside: s.originalIsOutside,
-        teacher: s.teacher,
-        weather_reason: s.weather_reason,
-      }));
-      weatherNotificationText.value =
-        response.data.message || "변경된 스케줄이 있습니다.";
+      changedSchedules.value = response.data.items.map((s) => {
+        console.log("매핑된 데이터:", s);
+        return {
+          datefcst: s.datefcst,
+          minutes: s.minutes,
+          program: s.program,
+          isoutside: s.isoutside,
+          originalIsOutside: s.originalIsOutside,
+          teacher: s.teacher,
+          weather_reason: s.weather_reason,
+        };
+      });
+      weatherNotificationText.value = response.data.message || "변경된 스케줄이 있습니다.";
+      console.log("최종 changedSchedules:", changedSchedules.value);
     } else {
       changedSchedules.value = [];
       weatherNotificationText.value =
         response.data.message ||
-        "안녕하세요, 학부모님!\n\n현재 날씨에 따라 변경된 스케줄이 없습니다. 아이들이 평소처럼 즐겁게 지낼 예정이에요.\n\n감사합니다!";
+        "안녕하세요, 학부모님!\n\n현재 날씨에 따라 변경된 스케줄이 없습니다.";
+      console.log("변경된 스케줄 없음");
     }
+
+    debugTemp.value = temperature;
+    debugPrecip.value = precipitation;
+    console.log("weatherNotificationText:", weatherNotificationText.value);
 
     for (const schedule of changedSchedules.value) {
       await updateScheduleInDB(schedule);
     }
     await fetchAllSchedules();
   } catch (error) {
-    console.error("변경된 스케줄 가져오기 실패:", error);
-    weatherNotificationText.value =
-      "변경된 스케줄을 가져오지 못했습니다. 백엔드 오류를 확인해주세요.";
+    console.error("에러:", error);
+    weatherNotificationText.value = "변경된 스케줄을 가져오지 못했습니다.";
     changedSchedules.value = [];
+  } finally {
+    isLoading.value = false;
   }
 };
 
@@ -253,9 +252,10 @@ const updateScheduleInDB = async (schedule) => {
   try {
     await api.put("/schedule/api/schedules", {
       datetime: schedule.datefcst,
+      program: schedule.program, // 고유 식별용 추가
       isoutside: schedule.isoutside,
     });
-    console.log(`DB 업데이트 성공: ${schedule.datefcst} - isoutside: ${schedule.isoutside}`);
+    console.log(`DB 업데이트 성공: ${schedule.datefcst} - ${schedule.program}`);
   } catch (error) {
     console.error("DB 업데이트 실패:", error);
   }
